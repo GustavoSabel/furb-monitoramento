@@ -4,15 +4,20 @@ var DISP_NAO_ENCONTRATO = 'naoencontrado';
 var DISP_CONECTADO = 'conectado';
 var DISP_CONECTANDO = 'conectando';
 var DISP_NAO_CONECTADO = 'naoconectado';
+
 var TEMPO_EXPIRACAO = 30000 //30 segundos
 var DELAY_CONSULTAS_SENSOR = 3000;
 
-//A chave é o IP e o valor é o endereço mac
+/**
+ * Chave: IP
+ * Valores: {data(data da ultima verificação), socket, macAddress
+ */
 var dispositivos = [];
 var webSocketManager;
+
 $(function(){
 	webSocketManager = new WebSocketManager(aoConectar, aoReceberMensagem, aoDesconectar, aOcorrerErro);
-	exibirCadastrados(buscarIps);
+	exibirCadastrados(buscarDispositivos);
 	verificarExpiracao();
 });
 
@@ -44,13 +49,13 @@ function exibirCadastrados(callback) {
 		data.forEach(function(row) {
 			linhas += "<tr class='"+ DISP_NAO_ENCONTRATO +"' id='"+ row[1].macToId() +"'>";
 			linhas += "<td class='macaddress'	>" + row[1] + "</td>";
-			linhas += "<td class='status'		> # </td>";
-			linhas += "<td class='ip'			> # </td>";
+			linhas += "<td class='status'		> ... </td>";
+			linhas += "<td class='ip'			> ... </td>";
 			linhas += "<td class='local'		>" + row[2] + "</td>";
 			linhas += "<td class='observacao'	>" + row[3] + "</td>";
 			linhas += "<td class='comandos'>";
-			linhas += "<input type='checkbox' name='relay' value='relay' onchange='toggleRelay(this, \""+ row[1]+"\")'>Relay</input>";
-			linhas += "<button onClick='Desligar(\""+ row[1] +"\")'>Desligar</button>";
+			linhas += "<input type='checkbox' name='relay' value='relay' onchange='toggleRelay(this, \""+ row[1]+"\")'/><span>Relay</span>";
+			linhas += "<button onClick='desligar(\""+ row[1] +"\")'>Desligar</button>";
 			linhas += "</td>";
 			linhas += "<td class='sensor'>...</td>";
 			linhas += "</tr>";
@@ -62,17 +67,12 @@ function exibirCadastrados(callback) {
 	}, 'json');
 }
 
-function toggleRelay(relay, mac) {
-	var ip = pegarIpGrid(mac);
-	webSocketManager.setRelay(ip, (relay.checked? 1 : 0 ))
-}
-
-function buscarIps() {
+function buscarDispositivos() {
  	var dados = {};
  	dados["apenas_cadastrados"] = "1";
  	var dadosJson = JSON.stringify(dados);
 
- 	AjustarStatusLinhas(DISP_NAO_ENCONTRATO, DISP_NAO_ENCONTRATO, "Procurando...")
+ 	atualizarStatusByClasse(DISP_NAO_ENCONTRATO, DISP_NAO_ENCONTRATO, "Procurando...")
  	
 	$.post(path_consulta, dadosJson, function (data) {
 		for(var ip in data) {
@@ -83,23 +83,23 @@ function buscarIps() {
 			}
 		}
 
-		AjustarStatusLinhas(DISP_NAO_ENCONTRATO, DISP_NAO_ENCONTRATO, "Não encontrato")
+		atualizarStatusByClasse(DISP_NAO_ENCONTRATO, DISP_NAO_ENCONTRATO, "Não encontrato")
 	}, "json");
 }
 
-function AjustarStatusLinhas(classeOriginal, novaClasse, statusDescricao) {
+function atualizarStatusByClasse(classeOriginal, novaClasse, statusDescricao) {
 	var linhas = document.querySelectorAll("tr." + classeOriginal);
 	for(var i = 0; i< linhas.length; i++) {
-		AjustarLinha(linhas[i], novaClasse, statusDescricao, null)
+		atualizarStatusByLinha(linhas[i], novaClasse, statusDescricao, null)
 	}
 }
 
-function AtualizarStatus(MacAddress, classe, status, ip, sensor) {
+function atualizarStatusByMac(MacAddress, classe, status, ip, sensor) {
 	var linha = document.querySelector("#" + MacAddress.macToId());
-	AjustarLinha(linha, classe, status, ip, sensor) 
+	atualizarStatusByLinha(linha, classe, status, ip, sensor) 
 }
 
-function AjustarLinha(linha, classe, status, ip, sensor) {
+function atualizarStatusByLinha(linha, classe, status, ip, sensor) {
 	if(classe != null) {
 		linha.className = classe;
 	}
@@ -117,6 +117,33 @@ function AjustarLinha(linha, classe, status, ip, sensor) {
 	}
 }
 
+function toggleRelay(relay, mac) {
+	var ip = getIpByMac(mac);
+	webSocketManager.setRelay(ip, (relay.checked? 1 : 0 ))
+}
+
+function desligar(mac) {
+	var ip = getIpByMac(mac);
+	webSocketManager.desligar(ip);
+}
+
+/*
+function ConectarNovamente() {
+	var naoConectados = document.querySelectorAll("tr." + DISP_NAO_CONECTADO);
+	for(var i = 0; i < naoConectados.length; i++) {
+		var celulaIp = naoConectados[i].querySelector("td.ip");
+		var ip = celulaStatus.firstChild.textContent;
+		conectar(ip);
+	}
+}*/
+
+function conectar(ip) {
+	var mac = dispositivos[ip]["macAddress"];
+	var socket = webSocketManager.conectar(ip, mac);
+	dispositivos[ip]["socket"] = socket;
+	atualizarStatusByMac(mac, DISP_CONECTANDO, "Conectando...", socket.ip);
+}
+
 function aoReceberMensagem(event, socket) {	
 	console.log(event);
 	resultado = JSON.parse(event.data);
@@ -129,7 +156,7 @@ function aoReceberMensagem(event, socket) {
 			var segundosSemMovimento = (Date.now() - dispositivos[socket.ip]["ultimoMovimento"])/1000; 
 			statusSensor = segundosSemMovimento + "s sem movimento"
 		}
-		AtualizarStatus(socket.macAddress, null, null, null, statusSensor);
+		atualizarStatusByMac(socket.macAddress, null, null, null, statusSensor);
 
 		
 		/*var linha = document.querySelector("#" + socket.macAddress.macToId());
@@ -145,43 +172,25 @@ function aoReceberMensagem(event, socket) {
 }
 
 function aoDesconectar(event, socket) {
-	AtualizarStatus(socket.macAddress, DISP_NAO_CONECTADO, "Desconectou...", null);
+	atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Desconectado", null);
 }
 
 function aOcorrerErro(event, socket) {
-	AtualizarStatus(socket.macAddress, DISP_NAO_CONECTADO, "Erro na conexão", null);
+	atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Erro na conexão", null);
 }
 
 function aoConectar(sucesso, socket) {
 	if(sucesso) {
 		dispositivos[socket.ip]["data"] = Date.now();
 		webSocketManager.consultarSensor(socket.ip);
-		AtualizarStatus(socket.macAddress, DISP_CONECTADO, "Conectado", null);
+		atualizarStatusByMac(socket.macAddress, DISP_CONECTADO, "Conectado", null);
 	} else {
-		AtualizarStatus(socket.macAddress, DISP_NAO_CONECTADO, "Erro conexão", null);
+		atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Erro ao conectar", null);
 	}
 }
 
-function Desligar(mac) {
-	var ip = pegarIpGrid(mac);
-	desligar(ip);
-}
-
-function BuscarNovamente() {
-	buscarIps();
-}
-
-function ConectarNovamente() {
-	var naoConectados = document.querySelectorAll("tr." + DISP_NAO_CONECTADO);
-	for(var i = 0; i < naoConectados.length; i++) {
-		var celulaIp = naoConectados[i].querySelector("td.ip");
-		var ip = celulaStatus.firstChild.textContent;
-		conectar(ip);
-	}
-}
-
-function pegarIpGrid(mac) {
-	var linha = document.querySelector("#" + mac.macToId());
+function getIpByMac(mac) {
+	var linha = getLinhaByMac(mac);
 	var celulaIp = linha.querySelector("td.ip");
 	return celulaIp.firstChild.textContent;
 }
@@ -192,11 +201,4 @@ function getLinhaByIP(ip) {
 
 function getLinhaByMac(mac) {
 	return document.querySelector("#" + mac.macToId());
-}
-
-function conectar(ip) {
-	var linha = getLinhaByIP(ip);
-	AjustarLinha(linha, DISP_CONECTANDO, "Conectando...", null);
-	var socket = webSocketManager.conectar(ip, dispositivos[ip]["macAddress"]);
-	dispositivos[ip]["socket"] = socket;
 }

@@ -1,0 +1,38 @@
+#EspStatus {
+	border-style: solid;
+	border-color: #ff0000;
+}
+
+.EspStatus {
+	border-style: solid;
+	border-color: #0000ff;
+}
+
+.EspLog div {
+	/*border-style: solid;
+    border-color: #0000ff;*/
+	
+}
+
+#TabelaMonitoriamento .naoencontrado td, #TabelaMonitoriamento .naoconectado td{
+	background-color: #FF0000;
+}
+
+#TabelaMonitoriamento .procurando td{
+	background-color: #00ffff;
+}
+
+#TabelaMonitoriamento .conectando td{
+	background-color: #ffff00;
+}
+
+#TabelaMonitoriamento .conectado td{
+	background-color: #06ff00;
+}
+
+#TabelaMonitoriamento tr.naoencontrado td.comandos *, 
+#TabelaMonitoriamento tr.naoconectado td.comandos *, 
+#TabelaMonitoriamento tr.conectando td.comandos *,
+#TabelaMonitoriamento tr.procurando td.comandos * {
+	display: none;
+}

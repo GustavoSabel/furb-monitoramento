@@ -1,9 +1,10 @@
 ﻿<?php ob_start(); ?>
 
 <script src="Resources/monitoramento.js"></script>
+<link rel="stylesheet" type="text/css" href="Resources/monitoramento.css">
 
-<button onClick="BuscarNovamente()">Buscar novamente</button>
-<button onClick="ConectarNovamente()">Tentar conectar novamente</button>
+<button onClick="buscarDispositivos()">Buscar novamente</button>
+<!--  <button onClick="ConectarNovamente()">Tentar conectar novamente</button> -->
 <table id="TabelaMonitoriamento">
 	<tr>
 		<th>Mac Addrress</th>
