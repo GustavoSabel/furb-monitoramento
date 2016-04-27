@@ -57,7 +57,7 @@ function exibirCadastrados(callback) {
 			linhas += "<input type='checkbox' name='relay' value='relay' onchange='toggleRelay(this, \""+ row[1]+"\")'/><span>Relay</span>";
 			linhas += "<button onClick='desligar(\""+ row[1] +"\")'>Desligar</button>";
 			linhas += "</td>";
-			linhas += "<td class='sensor'>...</td>";
+			linhas += "<td class='sensor'> ... </td>";
 			linhas += "</tr>";
 		});
 
@@ -72,18 +72,18 @@ function buscarDispositivos() {
  	dados["apenas_cadastrados"] = "1";
  	var dadosJson = JSON.stringify(dados);
 
- 	atualizarStatusByClasse(DISP_NAO_ENCONTRATO, DISP_NAO_ENCONTRATO, "Procurando...")
+ 	atualizarStatusByClasse(DISP_NAO_ENCONTRATO, DISP_PROCURANDO, "Procurando...")
  	
 	$.post(path_consulta, dadosJson, function (data) {
 		for(var ip in data) {
 			dispositivos[ip] = { data : Date.now(), macAddress : data[ip] }
-			var linha = document.querySelector("#" + data[ip].macToId());
-			if(linha != null && linha.className == DISP_NAO_ENCONTRATO ) {
+			var linha = getLinhaByIP(ip);
+			if(linha != null && linha.className == DISP_PROCURANDO ) {
 				conectar(ip)
 			}
 		}
 
-		atualizarStatusByClasse(DISP_NAO_ENCONTRATO, DISP_NAO_ENCONTRATO, "Não encontrato")
+		atualizarStatusByClasse(DISP_PROCURANDO, DISP_NAO_ENCONTRATO, "Não encontrato")
 	}, "json");
 }
 

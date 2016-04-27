@@ -74,18 +74,15 @@ function WebSocketManager(onConnect, onMessage, onDisconect, onError) {
 	}
 
 	this.conectar = function(ip, macAddress) {
-		var abrindoConexao = false;
+		var abrindoConexao = true;
 
 		var socket = new WebSocket('ws://' + ip + '/events');
 		socket.macAddress = macAddress;
 		socket.ip = ip;
 
 		if (document.getElementById(ip) == null) {
-			$("#EspStatus")
-					.append(
-							"<div class='EspStatus'><div>IP:" + ip
-									+ "<div><div class='EspLog' id='" + ip
-									+ "'></div>");
+			$("#EspStatus").append(
+				"<div class='EspStatus'><div>IP:" + ip + "<div><div class='EspLog' id='" + ip + "'></div>");
 		}
 
 		socket.log = function(msg, tipo) {

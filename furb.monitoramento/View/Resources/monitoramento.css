@@ -14,6 +14,10 @@
 	
 }
 
+#TabelaMonitoriamento {
+	width: 100%;	
+}
+
 #TabelaMonitoriamento .naoencontrado td, #TabelaMonitoriamento .naoconectado td{
 	background-color: #FF0000;
 }
