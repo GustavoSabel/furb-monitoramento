@@ -1,9 +1,18 @@
 ﻿<?php ob_start(); ?>
 
 <script src="Resources/monitoramento.js"></script>
-<link rel="stylesheet" type="text/css" href="Resources/monitoramento.css">
+<link rel="stylesheet" type="text/css"
+	href="Resources/monitoramento.css">
 
-<button onClick="buscarDispositivos()">Buscar novamente</button>
+<button onClick="buscarDispositivos()">
+	Buscar novamente <span class="tooltip"> <img
+		src="Resources/Imagens/help.png" alt="help" /> <span
+		class="tooltiptext"> Caso alguns dispositivos não tenham sido
+			encontrados, ao clicar nesse comando será feita uma nova busca na
+			rede para encontrá-los. Os dispositivos já encontrados não sofrerão
+			impacto. </span>
+	</span>
+</button>
 <!--  <button onClick="ConectarNovamente()">Tentar conectar novamente</button> -->
 <table id="TabelaMonitoriamento">
 	<tr>

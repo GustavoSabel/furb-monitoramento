@@ -1,27 +1,35 @@
 <?php ob_start(); ?>
 <script>
+
+var contador = 0;
+var total = 0;
+
 $(function(){
-	
+	var webSocketManager = new WebSocketManager(aoConectar);
 	$.post(path_consulta, "{}", function (data){
 		console.log(data);
-		var total = Object.keys(data).length;
-		var contador = 0;
-		$(".status").html("Procurando... Verificados 0 de " + total);
-		for(var key in data) {
-			conectar(key, function(sucesso, ip) {
-				var mac = data[ip];
-				if(sucesso) {
-					addAoGrid(mac, ip);
-				}
-				contador++;
-				$(".status").html("Procurando... Verificados " + contador + " de " + total);
-				if(contador == total){
-					$(".status").html("Busca finalizada");
-				}
-			});
+		total = Object.keys(data).length;
+		if(total > 0) {
+			$(".status").html("Procurando... Verificados 0 de " + total);
+			for(var ip in data) {
+				webSocketManager.conectar(ip, data[ip]);
+			}
+		} else {
+			$(".status").html("Nenhum dispositivo encontrado");
 		}
 	}, "json");
 });
+
+function aoConectar (sucesso, socket) {
+	if(sucesso) {
+		addAoGrid(socket.macAddress, socket.ip);
+	}
+	contador++;
+	$(".status").html("Procurando... Verificados " + contador + " de " + total);
+	if(contador == total){
+		$(".status").html("Busca finalizada");
+	}
+}
 /*
 function jaCadastrado(mac) {
 	var dados = {};
@@ -110,8 +118,8 @@ function addAoGrid(mac, ip) {
 <div id="EspStatus"></div>
 
 <?php
-	$pagemaincontent = ob_get_contents();
-	ob_end_clean();
-	$titulo = "Cadastro automático";
-	include("master.php");
+$pagemaincontent = ob_get_contents ();
+ob_end_clean ();
+$titulo = "Cadastro automático";
+include ("master.php");
 ?>

@@ -55,8 +55,22 @@ html, body {
 }
 
 
+/*ESTILO DO LOG DO WEBSOCKET*/
+#EspStatus {
+	border-style: solid;
+	border-color: #ff0000;
+}
 
+.EspStatus {
+	border-style: solid;
+	border-color: #0000ff;
+}
 
+.EspLog div {
+	/*border-style: solid;
+    border-color: #0000ff;*/
+	
+}
 
 .Sucesso {
 	color: green
