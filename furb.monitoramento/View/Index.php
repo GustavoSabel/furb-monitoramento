@@ -1,4 +1,12 @@
-﻿<?php ob_start(); ?>
+﻿<?php ob_start(); 
+	include_once '../Controller/ConfiguracoesController.php';
+	$configuracao = Buscar();
+	$configJson = json_encode($configuracao);
+?>
+
+<script>
+	var configuracoes = JSON.parse('<?php echo $configJson; ?>');
+</script>
 
 <script src="Resources/monitoramento.js"></script>
 <link rel="stylesheet" type="text/css"
@@ -18,9 +26,10 @@
 	<tr>
 		<th>Mac Addrress</th>
 		<th>Status</th>
+		<th>Histórico</th>
 		<th>IP</th>
 		<th>Localização</th>
-		<th>Observação</th>
+		<th>Obs</th>
 		<th>Comandos</th>
 		<th>Sensor</th>
 	</tr>

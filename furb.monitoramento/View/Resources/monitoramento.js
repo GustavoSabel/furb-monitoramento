@@ -27,7 +27,14 @@ var dispositivos = [];
 var webSocketManager;
 
 $(function(){
-	webSocketManager = new WebSocketManager(aoConectar, aoReceberMensagem, aoDesconectar, aOcorrerErro);
+	webSocketManager = new WebSocketManager(
+			configuracoes["Login"], 
+			configuracoes["Senha"],
+			aoConectar,
+			aoReceberMensagem,
+			aoDesconectar,
+			aoOcorrerErro);
+	
 	exibirCadastrados(buscarDispositivos);
 	verificarExpiracao();
 });
@@ -57,18 +64,38 @@ function exibirCadastrados(callback) {
 
 		$(".dispositivo").remove();
 		var linhas = "";
-		data.forEach(function(row) {
+		data.forEach(function(row) {	
+			
 			linhas += "<tr class='"+ DISP_NAO_ENCONTRATO +"' id='"+ row[1].macToId() +"'>";
 			linhas += "<td class='macaddress'	>" + row[1] + "</td>";
 			linhas += "<td class='status'		> ... </td>";
+
+			linhas += "<td class='historico'><span class='historico_ultimo'></span>";
+			linhas += "		<span class='tooltip  grande' > ";
+			linhas += "		<img src='Resources/Imagens/help.png' alt='help' /> ";
+			linhas += "		<span class='tooltiptext grande historico_tudo'></span>";
+			linhas += "</td>";
+			
 			linhas += "<td class='ip'			> ... </td>";
 			linhas += "<td class='local'		>" + row[2] + "</td>";
-			linhas += "<td class='observacao'	>" + row[3] + "</td>";
+			
+			linhas += "<td class='observacao'> ";
+			if(row[3] != "") {
+				linhas += "		<span class='tooltip'> ";
+				linhas += "		<img src='Resources/Imagens/help.png' alt='help' /> ";
+				linhas += "		<span class='tooltiptext'>" + row[3] + "</span>";
+			}
+			linhas += "</td>";
+			
 			linhas += "<td class='comandos'>";
 			linhas += "<input type='checkbox' name='relay' value='relay' onchange='toggleRelay(this, \""+ row[1]+"\")'/><span>Relay</span>";
 			linhas += "<button onClick='desligar(\""+ row[1] +"\")'>Desligar</button>";
 			linhas += "</td>";
+			
+
+
 			linhas += "<td class='sensor'> ... </td>";
+			
 			linhas += "</tr>";
 		});
 
@@ -105,8 +132,8 @@ function atualizarStatusByClasse(classeOriginal, novaClasse, statusDescricao) {
 	}
 }
 
-function atualizarStatusByMac(MacAddress, classe, status, ip, sensor) {
-	var linha = document.querySelector("#" + MacAddress.macToId());
+function atualizarStatusByMac(macAddress, classe, status, ip, sensor) {
+	var linha = getLinhaByMac(macAddress);
 	atualizarStatusByLinha(linha, classe, status, ip, sensor) 
 }
 
@@ -115,6 +142,7 @@ function atualizarStatusByLinha(linha, classe, status, ip, sensor) {
 		linha.className = classe;
 	}
 	if(status != null) {
+		addHistoricoByLinha(linha, status);
 		var celulaStatus = linha.querySelector("td.status");
 		celulaStatus.firstChild.textContent = status;
 	}
@@ -128,6 +156,30 @@ function atualizarStatusByLinha(linha, classe, status, ip, sensor) {
 	}
 }
 
+function addHistoricoByMac(macAddress, historico, historico_resumido) {
+	addHistoricoByLinha(getLinhaByMac(macAddress), historico, historico_resumido);
+}
+
+function addHistoricoByIP(IP, historico, historico_resumido) {
+	addHistoricoByLinha(getLinhaByIP(IP), historico, historico_resumido);
+}
+
+function addHistoricoByLinha(linha, historico, historico_resumido) {
+	var elemento = linha.querySelector("td.historico .historico_ultimo");
+	if(historico_resumido != null && historico_resumido != "")
+		elemento.innerText = historico_resumido;
+	else 
+		elemento.innerText = historico;
+	
+	var elemento = linha.querySelector("td.historico .historico_tudo");
+	
+	var span = document.createElement("span");
+	var textNode = document.createTextNode(getHora() + " - " + historico);
+	span.appendChild(textNode);
+	elemento.appendChild(span);
+	elemento.appendChild(document.createElement("br"));
+}
+
 function toggleRelay(relay, mac) {
 	var ip = getIpByMac(mac);
 	webSocketManager.setRelay(ip, (relay.checked? 1 : 0 ))
@@ -136,17 +188,9 @@ function toggleRelay(relay, mac) {
 function desligar(mac) {
 	var ip = getIpByMac(mac);
 	webSocketManager.desligar(ip);
+	
+	addHistoricoByMac(mac, "Enviado comando para desligar", "Desligando");
 }
-
-/*
-function ConectarNovamente() {
-	var naoConectados = document.querySelectorAll("tr." + DISP_NAO_CONECTADO);
-	for(var i = 0; i < naoConectados.length; i++) {
-		var celulaIp = naoConectados[i].querySelector("td.ip");
-		var ip = celulaStatus.firstChild.textContent;
-		conectar(ip);
-	}
-}*/
 
 function conectar(ip) {
 	var mac = dispositivos[ip]["macAddress"];
@@ -169,6 +213,12 @@ function atualizarSensor(socket, statusSensor) {
 		var segundosSemMovimento = (Date.now() - dispositivos[socket.ip]["ultimoMovimento"])/1000; 
 		segundosSemMovimento = Math.round(segundosSemMovimento*100)/100;
 		statusSensor = segundosSemMovimento + "s sem movimento"
+		
+		if(segundosSemMovimento > configuracoes["TempoDesligamento"]) {
+			dispositivos[socket.ip]["ultimoMovimento"] = Date.now();
+			addHistoricoByMac(socket.macAddress, "Ficou muito tempo sem movimento. Será desligado", "Será desligado");
+			desligar(socket.macAddress);
+		}
 	}
 	dispositivos[socket.ip]["ultimaStatusSensorRecebido"] = Date.now();
 
@@ -204,7 +254,7 @@ function aoDesconectar(event, socket) {
 	atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Desconectado", null);
 }
 
-function aOcorrerErro(event, socket) {
+function aoOcorrerErro(event, socket) {
 	atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Erro na conexão", null);
 }
 
@@ -217,6 +267,7 @@ function aoConectar(sucesso, socket) {
 		webSocketManager.consultarSensor(socket.ip);
 	} else {
 		atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Erro ao conectar", null);
+		//TODO: Exibir a mensagem do erro no histórico
 	}
 }
 

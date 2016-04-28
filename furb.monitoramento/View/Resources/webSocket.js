@@ -3,7 +3,7 @@ var OPEN = 1 // The connection is open and ready to communicate.
 var CLOSING = 2 // The connection is in the process of closing.
 var CLOSED = 3 // The connection is closed or couldn't be opened.
 
-function WebSocketManager(onConnect, onMessage, onDisconect, onError) {
+function WebSocketManager(login, password, onConnect, onMessage, onDisconect, onError) {
 
 	var sockets = {};
 
@@ -93,8 +93,8 @@ function WebSocketManager(onConnect, onMessage, onDisconect, onError) {
 		socket.onopen = function() {
 			abrindoConexao = true;
 			this.send(JSON.stringify({
-				User : 'olimex',
-				Password : 'olimex'
+				User : login,
+				Password : password
 			}));
 		};
 

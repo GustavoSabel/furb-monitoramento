@@ -1,6 +1,6 @@
 <?php 
-	include_once '../Controller/ConfiguracoesController.php';
 	ob_start(); 
+	include_once '../Controller/ConfiguracoesController.php';
 	$configuracao = Buscar();
 ?>
 

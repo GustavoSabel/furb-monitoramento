@@ -1,11 +1,21 @@
-<?php ob_start(); ?>
+<?php ob_start(); 
+	include_once '../Controller/ConfiguracoesController.php';
+	$configuracao = Buscar();
+	$configJson = json_encode($configuracao);
+?>
+
 <script>
+var configuracoes = JSON.parse('<?php echo $configJson; ?>');
 
 var contador = 0;
 var total = 0;
 
 $(function(){
-	var webSocketManager = new WebSocketManager(aoConectar);
+	var webSocketManager = new WebSocketManager(
+			configuracoes["Login"], 
+			configuracoes["Senha"], 
+			aoConectar);
+	
 	$.post(path_consulta, "{}", function (data){
 		console.log(data);
 		total = Object.keys(data).length;
