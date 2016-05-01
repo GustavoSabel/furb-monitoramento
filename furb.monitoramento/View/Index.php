@@ -23,14 +23,14 @@
 <!--  <button onClick="ConectarNovamente()">Tentar conectar novamente</button> -->
 <table id="TabelaMonitoriamento">
 	<tr>
-		<th>Mac Addrress</th>
-		<th>Status</th>
-		<th>Histórico</th>
-		<th>IP</th>
-		<th>Localização</th>
-		<th>Obs</th>
-		<th>Comandos</th>
-		<th>Sensor</th>
+		<th class='colMac'>Mac Addrress</th>
+		<th class='colStatus'>Status</th>
+		<th class='colHistorio'>Histórico</th>
+		<th class='colIP'>IP</th>
+		<th class='colLocal'>Localização</th>
+		<th class='colObs'>Obs</th>
+		<th class='colComandos'>Comandos</th>
+		<th class='colSensor'>Sensor</th>
 	</tr>
 </table>
 

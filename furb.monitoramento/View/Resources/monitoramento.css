@@ -1,26 +1,39 @@
 #TabelaMonitoriamento {
-	width: 100%;	
+	width: 100%;
 }
 
-#TabelaMonitoriamento .naoencontrado td, #TabelaMonitoriamento .naoconectado td{
+#TabelaMonitoriamento .naoencontrado td, #TabelaMonitoriamento .naoconectado td
+	{
 	background-color: #FF0000;
 }
 
-#TabelaMonitoriamento .procurando td{
+#TabelaMonitoriamento .procurando td {
 	background-color: #00ffff;
 }
 
-#TabelaMonitoriamento .conectando td{
+#TabelaMonitoriamento .conectando td {
 	background-color: #ffff00;
 }
 
-#TabelaMonitoriamento .conectado td{
+#TabelaMonitoriamento .conectado td {
 	background-color: #06ff00;
 }
 
-#TabelaMonitoriamento tr.naoencontrado td.comandos *, 
-#TabelaMonitoriamento tr.naoconectado td.comandos *, 
-#TabelaMonitoriamento tr.conectando td.comandos *,
-#TabelaMonitoriamento tr.procurando td.comandos * {
+#TabelaMonitoriamento td.macaddress {
+	width: 50px;
+}
+
+#TabelaMonitoriamento td.macaddress {
+	width: 50px;
+}
+
+#TabelaMonitoriamento td.sensor {
+	width: 300px;
+}
+
+#TabelaMonitoriamento tr.naoencontrado td.comandos *,
+	#TabelaMonitoriamento tr.naoconectado td.comandos *,
+	#TabelaMonitoriamento tr.conectando td.comandos *,
+	#TabelaMonitoriamento tr.procurando td.comandos * {
 	display: none;
 }
