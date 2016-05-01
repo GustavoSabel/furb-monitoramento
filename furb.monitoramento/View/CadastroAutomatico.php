@@ -20,12 +20,12 @@ $(function(){
 		console.log(data);
 		total = Object.keys(data).length;
 		if(total > 0) {
-			$(".status").html("Procurando... Verificados 0 de " + total);
+			exibirMensagem("Procurando... Verificados 0 de " + total);
 			for(var ip in data) {
 				webSocketManager.conectar(ip, data[ip]);
 			}
 		} else {
-			$(".status").html("Nenhum dispositivo encontrado");
+			exibirMensagem("Nenhum dispositivo encontrado");
 		}
 	}, "json");
 });
@@ -35,23 +35,12 @@ function aoConectar (sucesso, socket) {
 		addAoGrid(socket.macAddress, socket.ip);
 	}
 	contador++;
-	$(".status").html("Procurando... Verificados " + contador + " de " + total);
+	exibirMensagem("Procurando... Verificados " + contador + " de " + total);
 	if(contador == total){
-		$(".status").html("Busca finalizada");
+		exibirMensagem("Busca finalizada");
 	}
 }
-/*
-function jaCadastrado(mac) {
-	var dados = {};
-	dados["operacao"] = "buscar";
-	dados["macaddress"] = mac;
-	
-	$.post(path_cadastro, JSON.stringify(dados), function (data){
-		if(Object.keys(data).length > 0) {
-		}
-	}, 'json');
-}
-*/
+
 function cadastrar(mac) {
 	var dados = {};
 	dados["operacao"] = "cadastrar";

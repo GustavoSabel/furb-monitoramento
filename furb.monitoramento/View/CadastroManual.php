@@ -1,79 +1,18 @@
 <?php ob_start(); ?>
 
-<script>
-$(function(){
-	$("#cadastro").submit(function( event ) {
-		$("#status").html("");
-
-		var dados = {};
-		dados["operacao"] = "cadastrar";
-		dados["macaddress"] = $("#macaddress").val();
-		dados["localizacao"] = $("#localizacao").val();
-		dados["observacao"] = $("#observacao").val();
-		var dadosJson = JSON.stringify(dados);
-		
-		$.post(path_cadastro, dadosJson, function (data){
-			showStatus(data);
-			atualizarGrid();
-		}, 'json');
-		event.preventDefault();
-	});
-
-	atualizarGrid();
-});
-
-function showStatus(data) {
-	$("#status").html(data.mensagem);
-}
-
-function remover(id) {
-	var dados = {};
-	dados["operacao"] = "excluir";
-	dados["id"] = id;
-	var dadosJson = JSON.stringify(dados);
-	console.log(dadosJson);
-	$.post(path_cadastro, dadosJson, function (data){
-		showStatus(data);
-		atualizarGrid();
-	}, 'json');
-}
-
-function montarBotaoRemover(id) {
-	return "<button class='comando excluir' onClick='remover(\"" + id + "\")'>Remover</button>";
-}
-
-function atualizarGrid() {
-	var dados = JSON.stringify({operacao:"buscar"});
-	console.log(dados);
-	$.post(path_cadastro, dados, function (data) {
-		console.log(data);
-
-		$(".dispositivo").remove();
-		var linhas = "";
-		data.forEach(function(row) {
-			linhas += "<tr class='dispositivo' id='"+ row[0] +"'>";
-			linhas += "<td>" + montarBotaoRemover(row[0]) + "</td>";
-			linhas += "<td>" + row[1] + "</td>";
-			linhas += "<td>" + row[2] + "</td>";
-			linhas += "<td>" + row[3] + "</td>";
-			linhas += "</tr>";
-		});
-
-		$("#DispositivosCadastrados").append(linhas);
-	}, 'json');
-}
-</script>
+<script src="Resources/cadastroManual.js"></script>
 
 <div>
-	<form id="cadastro" action="Teste.php" method="post">
-		Mac Address: <br> <input type="text" name="macaddress"
-			id="macaddress" autocomplete="on"> <br> Localização: <br> <input
-			type="text" name="localizacao" id="localizacao" autocomplete="off">
-		<br> Observação: <br> <input type="text" name="observacao"
-			id="observacao" autocomplete="off"> <br> <input type="submit"
-			Value="Cadastrar" />
+	<form id="formCadastro" action="" method="post"> 
+		Mac Address: <br> 
+		<input type="text" name="macaddress" id="macaddress" autocomplete="off"> <br> 
+		Localização: <br> 
+		<input type="text" name="localizacao" id="localizacao" autocomplete="off"> <br> 
+		Observação: <br> 
+		<input type="text" name="observacao" id="observacao" autocomplete="off"> <br> 
+		<input type="submit" id="btnCadastrar" Value="Cadastrar" />
 	</form>
-	<div id="status"></div>
+	<button id="btnCancelar" onClick="limpar()">Cancelar</button>
 </div>
 <br>
 <table id="DispositivosCadastrados">

@@ -17,16 +17,12 @@ $(function(){
 		var dadosJson = JSON.stringify(dados);
 		
 		$.post(path_configuracoes, dadosJson, function (data){
-			showStatus(data);
+			exibirMensagem(data.mensagem, data.status);
 			atualizarGrid();
 		}, 'json');
 		event.preventDefault();
 	});
 });
-
-function showStatus(data) {
-	$("#status").html(data.mensagem);
-}
 </script>
 
 <div>

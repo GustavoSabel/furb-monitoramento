@@ -22,21 +22,11 @@ class Configuracao {
 		return $config;
 	}
 	public function Alterar($Nome, $Senha, $TempoDesligamento) {
-		$conn = Conexao::Abrir ();
 		$query = "update configuracoes set login = '$Nome', senha = '$Senha', tempodesligamento = $TempoDesligamento";
-		if ($conn->query ( $query ) === TRUE) {
-			return true;
-		} else {
-			return "Erro: " . $query . "<br>" . $conn->error;
-		}
+		return Conexao::Executar($query);
 	}
 	public function Inserir($Nome, $Senha, $TempoDesligamento) {
-		$conn = Conexao::Abrir ();
 		$query = "insert into configuracoes (login, senha, tempodesligamento) values ('$Nome', '$Senha', $TempoDesligamento)";
-		if ($conn->query ( $query ) === TRUE) {
-			return true;
-		} else {
-			return "Erro: " . $query . "<br>" . $conn->error;
-		}
+		return Conexao::Executar($query);
 	}
 }

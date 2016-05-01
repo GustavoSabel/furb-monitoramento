@@ -13,5 +13,14 @@
 			} 			
 			return $conn;
 		}
+		
+		public static function Executar($query) {
+			$conn = Conexao::Abrir ();
+			if ($conn->query ( $query ) === TRUE) {
+				return true;
+			} else {
+				return "Erro: " . $query . "<br>" . $conn->error;
+			}
+		}
 	}
 ?>

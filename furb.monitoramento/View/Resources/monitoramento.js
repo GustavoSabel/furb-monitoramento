@@ -60,7 +60,7 @@ function exibirCadastrados(callback) {
 	var dados = JSON.stringify({operacao:"buscar"});
 	console.log(dados);
 	$.post(path_cadastro, dados, function (data) {
-		console.log(data);
+		//console.log(data);
 
 		$(".dispositivo").remove();
 		var linhas = "";
@@ -92,8 +92,6 @@ function exibirCadastrados(callback) {
 			linhas += "<button onClick='desligar(\""+ row[1] +"\")'>Desligar</button>";
 			linhas += "</td>";
 			
-
-
 			linhas += "<td class='sensor'> ... </td>";
 			
 			linhas += "</tr>";

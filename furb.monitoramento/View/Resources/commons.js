@@ -18,25 +18,12 @@ function getHora() {
     return d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 }
 
-function buscarConfiguracoesSistema() {
-	var dados = JSON.stringify({operacao:"buscar"});
-	console.log(dados);
-
-	var request = $.ajax({
-	  url: path_configuracoes,
-	  method: "POST",
-	  data: dados,
-	  dataType: "json",
-	  async:false
-	});
-	 
-	request.done(function( msg ) {
-		return msg;
-	});
-	
-	request.fail(function() {
-		throw "Erro ao buscar as configurações";
-	});
-	
-	return null;
+function exibirMensagem(mensagem, status) {
+	$("#mensagensSistema").fadeIn();
+	$("#mensagensSistema").html(mensagem);
+	if(status == 1) {
+		$("#mensagensSistema").attr("class", "ok");
+	} else if (status == 0){
+		$("#mensagensSistema").attr("class", "erro");
+	}
 }

@@ -9,11 +9,12 @@
 <body>
 	<h1 id="titulo_pagina"><?php echo $titulo;?></h1>
 		<div id="menus">
-		<a href="Index.php">Início</a>
-		<a href="CadastroManual.php">Cadastrar manualmente</a>
-		<a href="CadastroAutomatico.php">Cadastrar automaticamente</a>
-		<a href="Configuracoes.php">Configurações</a>
+			<a href="Index.php">Início</a>
+			<a href="CadastroManual.php">Cadastrar manualmente</a>
+			<a href="CadastroAutomatico.php">Cadastrar automaticamente</a>
+			<a href="Configuracoes.php">Configurações</a>
 		</div>
+		<div id="mensagensSistema"></div>
 		<div id="conteudo">
           <?php
             echo $pagemaincontent;

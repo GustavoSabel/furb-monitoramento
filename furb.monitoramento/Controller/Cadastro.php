@@ -8,6 +8,8 @@ $dados = json_decode ( file_get_contents ( 'php://input' ), true );
 $operacao = $dados ["operacao"];
 if ($operacao == "cadastrar") {
 	Cadastrar ( $dados ["macaddress"], $dados ["localizacao"], $dados ["observacao"] );
+} else if ($operacao == "editar") {
+	Editar ( $dados ["macaddress"], $dados ["localizacao"], $dados ["observacao"] );
 } else if ($operacao == "buscar") {
 	if (array_key_exists ( "macaddress", $dados )) {
 		Buscar ( $dados ["macaddress"] );
@@ -41,6 +43,27 @@ function Cadastrar($MacAddress, $Local, $observacao) {
 			} else {
 				$resultado ['status'] = STATUS_SUCESSO;
 				$resultado ['mensagem'] = 'Inserido com sucesso';
+			}
+		}
+	}
+	echo json_encode ( $resultado );
+}
+function Editar($MacAddress, $Local, $observacao) {
+	$resultado = array ();
+	$resultado ['status'] = STATUS_FALHA;
+	if ($MacAddress == null || trim ( $MacAddress ) == "") {
+		$resultado ['mensagem'] = "Mac Address não informado";
+	} else {
+		$dispositivos = new Dispositivos ();
+		$resultado = $dispositivos->Buscar ( null, $MacAddress );
+		if (count ( $resultado ) == 0) {
+			$resultado ['mensagem'] = "Mac Address '$MacAddress' ainda não foi cadastrado";
+		} else {
+			if (($result = $dispositivos->EditarPorMac( $MacAddress, $Local, $observacao )) !== true) {
+				$resultado ['mensagem'] = $result;
+			} else {
+				$resultado ['status'] = STATUS_SUCESSO;
+				$resultado ['mensagem'] = 'Editado com sucesso';
 			}
 		}
 	}
