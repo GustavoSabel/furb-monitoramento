@@ -7,9 +7,13 @@ input[readonly] {
 	background-color: #bfbfbf;
 }
 
+input[type=text], input[type=password] {
+	width: 100%;
+}
+
 #mensagensSistema {
 	text-align: right;
-	position: absolute;
+	position: fixed;
 	bottom: 0px;
 	right: 0px;
 	background-color: #80ffff;

@@ -42,19 +42,24 @@ function aoConectar (sucesso, socket) {
 }
 
 function cadastrar(mac) {
+
+	linha = getLinhaByMac(mac);	
+	var celulaLocal = linha.querySelector("input.local");
+	var local = celulaLocal.value;
+	var celulaObservacao = linha.querySelector("input.observacao");
+	var observacao = celulaObservacao.value;
+
 	var dados = {};
 	dados["operacao"] = "cadastrar";
 	dados["macaddress"] = mac;
-	dados["localizacao"] = "";
-	dados["observacao"] = "";
-	
+	dados["localizacao"] = local;
+	dados["observacao"] = observacao;
+
 	$.post(path_cadastro, JSON.stringify(dados), function (data){
-		var botao = document.querySelector("#" + mac.macToId() + " button");
-		var celula = botao.parentElement;
 		if(data.status == 1) {
-			celula.innerHTML = montarBotaoRemover(mac);
+			atualizarStatus(mac, true);
 		} else {
-			celula.innerHTML = data.mensagem;
+			exibirMensagem(data.mensagem, data.status)
 		}
 	}, 'json');
 }
@@ -65,14 +70,28 @@ function remover(mac) {
 	dados["macaddress"] = mac;
 	
 	$.post(path_cadastro, JSON.stringify(dados), function (data){
-		var botao = document.querySelector("#" + mac.macToId() + " button");
-		var celula = botao.parentElement;
 		if(data.status == 1) {
-			celula.innerHTML = montarBotaoCadastrar(mac);
+			atualizarStatus(mac, false);
 		} else {
-			celula.innerHTML = data.mensagem;
+			exibirMensagem(data.mensagem, data.status)
 		}
 	}, 'json');
+}
+
+function atualizarStatus(mac, estaCadastrado) {
+	var linha = getLinhaByMac(mac);
+	var botao = linha.querySelector("#" + mac.macToId() + " button");
+	var celula = botao.parentElement;
+
+	var local = linha.querySelector("input.local");
+	var observacao = linha.querySelector("input.observacao");
+	local.readOnly = estaCadastrado;//.prop('readonly', true);
+	observacao.readOnly = estaCadastrado;
+	if(estaCadastrado) {
+		celula.innerHTML = montarBotaoRemover(mac);
+	} else {
+		celula.innerHTML = montarBotaoCadastrar(mac);
+	}
 }
 
 function montarBotaoCadastrar(mac) {
@@ -91,16 +110,29 @@ function addAoGrid(mac, ip) {
 	$.post(path_cadastro, JSON.stringify(dados), function (data){
 			var linhas = "";
 			linhas += "<tr class='dispositivo' id='" + mac.macToId() + "'>";
+			var comando = "";
+			var local = "";
+			var observacao = "";
 			if(Object.keys(data).length == 0) {
-				linhas += "<td>" + montarBotaoCadastrar(mac) + "</td>"
+				comando = montarBotaoCadastrar(mac);
 			} else {
-				linhas += "<td>" + montarBotaoRemover(mac) + "</td>"
+				comando = montarBotaoRemover(mac);
+				local = data[0][2];
+				observacao = data[0][3];
 			}
+			linhas += "<td>" + comando + "</td>"
 			linhas += "<td>" + mac + "</td>";
 			linhas += "<td>" + ip + "</td>";
+			linhas += "<td><input type='text' value='" + local + "' class='local' autocomplete='off'></td>";
+			linhas += "<td><input type='text' value='" + observacao + "' class='observacao' autocomplete='off'></td>";
+
 			linhas += "</tr>";
 			$("#DispositivosEncontratos").append(linhas);
 	}, 'json');
+}
+
+function getLinhaByMac(mac) {
+	return document.querySelector("#" + mac.macToId());
 }
 
 </script>
@@ -110,7 +142,9 @@ function addAoGrid(mac, ip) {
 	<tr>
 		<th>Comando</th>
 		<th>Mac Address</th>
-		<th>ip</th>
+		<th>IP</th>
+		<th>Local</th>
+		<th>Observação</th>
 	</tr>
 </table>
 <br>
