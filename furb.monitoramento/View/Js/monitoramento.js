@@ -10,7 +10,8 @@ var DISP_NAO_CONECTADO = 'naoconectado';
 //do dispositivo deve ser zerado
 var TEMPO_EXPIRACAO_SENSOR = 1000*60*4; //4 minutos
 var TEMPO_EXPIRACAO = 30000 //30 segundos
-var DELAY_CONSULTAS_SENSOR = 3000;
+var DELAY_CONSULTAS_SENSOR 	= 5000;
+var VERIFICAR_SENSOR = true;
 
 /**
  * Chave: IP
@@ -46,7 +47,9 @@ function verificarExpiracao() {
 			if(dataAtual - dispositivos[ip]["dataUltimaComunicacao"] > TEMPO_EXPIRACAO) {
 				dispositivos[ip]["dataUltimaComunicacao"] = dataAtual;
 				if(dispositivos[ip]["socket"].readyState == OPEN) {
-					webSocketManager.consultarSensor(ip);
+					if(VERIFICAR_SENSOR) {
+						webSocketManager.consultarSensor(ip);
+					}
 				} else if(dispositivos[ip]["socket"].readyState == CLOSED) {
 					conectar(ip);
 				}
@@ -197,15 +200,24 @@ function conectar(ip) {
 	atualizarStatusByMac(mac, DISP_CONECTANDO, "Conectando...", socket.ip);
 }
 
+/**
+ * Verifica se o último status do sensor expirou, ou seja, 
+ * retorna true se faz muito tempo desde a última consulta feita ao sensor
+ * @param ip
+ * @returns {Boolean}
+ */
+function sensorExpirou(ip) {
+	return dispositivos[ip]["ultimaStatusSensorRecebido"] != null 
+	&& ((Date.now() - dispositivos[ip]["ultimaStatusSensorRecebido"]) > TEMPO_EXPIRACAO_SENSOR);
+}
+
 function atualizarSensor(socket, statusSensor) {
 	if(statusSensor == 1){
 		statusSensor = "Com movimento";
 		dispositivos[socket.ip]["ultimoMovimento"] = Date.now();
 	} else  {
 		//Se a última consulta ao sensor foi a muito tempo, então deve-se zerar o tempo
-		if(dispositivos[socket.ip]["ultimaStatusSensorRecebido"] != null && 
-				((Date.now() - dispositivos[socket.ip]["ultimaStatusSensorRecebido"]) > TEMPO_EXPIRACAO_SENSOR))
-		{
+		if(dispositivos[socket.ip]["ultimoMovimento"] == null || sensorExpirou(socket.ip)) {
 			dispositivos[socket.ip]["ultimoMovimento"] = Date.now();
 		}
 		var segundosSemMovimento = (Date.now() - dispositivos[socket.ip]["ultimoMovimento"])/1000; 
@@ -218,10 +230,10 @@ function atualizarSensor(socket, statusSensor) {
 			desligar(socket.macAddress);
 		}
 	}
-	dispositivos[socket.ip]["ultimaStatusSensorRecebido"] = Date.now();
 
 	atualizarStatusByMac(socket.macAddress, null, null, null, statusSensor);
 	
+	/*dispositivos[socket.ip]["ultimaStatusSensorRecebido"] = Date.now();
 	var diferencaTempo = 0;
 	if(dispositivos[socket.ip]["ultimaStatusSensorRequisitado"] != null) {
 		diferencaTempo = Date.now() - dispositivos[socket.ip]["ultimaStatusSensorRequisitado"];
@@ -229,7 +241,7 @@ function atualizarSensor(socket, statusSensor) {
 	setTimeout(function(){
 			dispositivos[socket.ip]["ultimaStatusSensorRequisitado"] = Date.now();
 			webSocketManager.consultarSensor(socket.ip);
-		}, DELAY_CONSULTAS_SENSOR - diferencaTempo);
+		}, DELAY_CONSULTAS_SENSOR - diferencaTempo);*/
 	
 }
 
@@ -240,8 +252,7 @@ function aoReceberMensagem(event, socket) {
 	if(resultado["EventURL"] == "/mod-io2") {
 		if(resultado["EventData"]["Data"] != null) {
 			atualizarSensor(socket, resultado["EventData"]["Data"]["GPIO3"]);
-		}
-		else{
+		} else {
 			atualizarStatusByMac(socket.macAddress, null, null, null, "Problema no sensor");
 			addHistoricoByMac(socket.macAddress, "Problema no sensor: " + resultado["EventData"]["Error"], "Problema no sensor");
 			console.log("Problema no Mod-io2. ");
@@ -257,13 +268,24 @@ function aoOcorrerErro(event, socket) {
 	atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Erro na conexão", null);
 }
 
+function iniciarVerificacaoSensor(ip) {
+	webSocketManager.consultarSensor(ip);
+	setTimeout(function(){
+		iniciarVerificacaoSensor(ip);
+	}, DELAY_CONSULTAS_SENSOR);
+}
+
 function aoConectar(sucesso, socket) {
 	if(sucesso) {
 		dispositivos[socket.ip]["dataUltimaComunicacao"] = Date.now();
-		if(dispositivos[socket.ip]["ultimoMovimento"] == null)
-			dispositivos[socket.ip]["ultimoMovimento"] = Date.now();
 		atualizarStatusByMac(socket.macAddress, DISP_CONECTADO, "Conectado", null);
-		webSocketManager.consultarSensor(socket.ip);
+		
+		if(VERIFICAR_SENSOR) {
+			iniciarVerificacaoSensor(socket.ip);
+			//if(dispositivos[socket.ip]["ultimoMovimento"] == null)
+			//	dispositivos[socket.ip]["ultimoMovimento"] = Date.now();
+			//webSocketManager.consultarSensor(socket.ip);
+		}
 	} else {
 		atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Erro ao conectar", null);
 		//TODO: Exibir a mensagem do erro no histórico
