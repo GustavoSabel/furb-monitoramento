@@ -9,7 +9,7 @@ var DISP_NAO_CONECTADO = 'naoconectado';
 //se a última consulta ao sensor de movimento ultrapassar esse tempo, então o cronômetro
 //do dispositivo deve ser zerado
 var TEMPO_EXPIRACAO_SENSOR = 1000*60*4; //4 minutos
-var TEMPO_EXPIRACAO = 30000 //30 segundos
+var TEMPO_VERIFICACAO_CONEXAO = 10000
 var DELAY_CONSULTAS_SENSOR 	= 5000;
 var VERIFICAR_SENSOR = true;
 
@@ -37,26 +37,39 @@ $(function(){
 			aoOcorrerErro);
 	
 	exibirCadastrados(buscarDispositivos);
-	verificarExpiracao();
+	iniciarVerificacaoConexao();
+	
+	if(VERIFICAR_SENSOR) {
+		iniciarVerificacaoSensor();
+	}
 });
 
-function verificarExpiracao() {
+function iniciarVerificacaoConexao() {
 	setTimeout(function(){
 		dataAtual = Date.now();
 		for(var ip in dispositivos) {
-			if(dataAtual - dispositivos[ip]["dataUltimaComunicacao"] > TEMPO_EXPIRACAO) {
+			if(dataAtual - dispositivos[ip]["dataUltimaComunicacao"] > TEMPO_VERIFICACAO_CONEXAO) {
 				dispositivos[ip]["dataUltimaComunicacao"] = dataAtual;
-				if(dispositivos[ip]["socket"].readyState == OPEN) {
-					if(VERIFICAR_SENSOR) {
-						webSocketManager.consultarSensor(ip);
-					}
-				} else if(dispositivos[ip]["socket"].readyState == CLOSED) {
+				if(dispositivos[ip]["socket"].readyState == CLOSED) {
 					conectar(ip);
+				} else if (dispositivos[ip]["socket"].readyState == OPEN) {
+					webSocketManager.mensagemVerificacao(dispositivos[ip]["socket"]);	
 				}
 			}
 		}
-		verificarExpiracao();
+		iniciarVerificacaoConexao();
 	}, 5000);
+}
+
+function iniciarVerificacaoSensor() {
+	for(var ip in dispositivos) {
+		if(dispositivos[ip]["socket"].readyState == OPEN) {
+			webSocketManager.consultarSensor(ip);			
+		} 
+	}
+	setTimeout(function(){
+		iniciarVerificacaoSensor();
+	}, DELAY_CONSULTAS_SENSOR);
 }
 
 function exibirCadastrados(callback) {
@@ -200,6 +213,7 @@ function conectar(ip) {
 	atualizarStatusByMac(mac, DISP_CONECTANDO, "Conectando...", socket.ip);
 }
 
+
 /**
  * Verifica se o último status do sensor expirou, ou seja, 
  * retorna true se faz muito tempo desde a última consulta feita ao sensor
@@ -208,7 +222,7 @@ function conectar(ip) {
  */
 function sensorExpirou(ip) {
 	return dispositivos[ip]["ultimaStatusSensorRecebido"] != null 
-	&& ((Date.now() - dispositivos[ip]["ultimaStatusSensorRecebido"]) > TEMPO_EXPIRACAO_SENSOR);
+	&& ((Date.now() - dispositivos[ip]["ultimaStatusSensorRecebido"]) > TEMPO_VERIFICACAO_CONEXAO_SENSOR);
 }
 
 function atualizarSensor(socket, statusSensor) {
@@ -268,24 +282,10 @@ function aoOcorrerErro(event, socket) {
 	atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Erro na conexão", null);
 }
 
-function iniciarVerificacaoSensor(ip) {
-	webSocketManager.consultarSensor(ip);
-	setTimeout(function(){
-		iniciarVerificacaoSensor(ip);
-	}, DELAY_CONSULTAS_SENSOR);
-}
-
 function aoConectar(sucesso, socket) {
 	if(sucesso) {
 		dispositivos[socket.ip]["dataUltimaComunicacao"] = Date.now();
 		atualizarStatusByMac(socket.macAddress, DISP_CONECTADO, "Conectado", null);
-		
-		if(VERIFICAR_SENSOR) {
-			iniciarVerificacaoSensor(socket.ip);
-			//if(dispositivos[socket.ip]["ultimoMovimento"] == null)
-			//	dispositivos[socket.ip]["ultimoMovimento"] = Date.now();
-			//webSocketManager.consultarSensor(socket.ip);
-		}
 	} else {
 		atualizarStatusByMac(socket.macAddress, DISP_NAO_CONECTADO, "Erro ao conectar", null);
 		//TODO: Exibir a mensagem do erro no histórico

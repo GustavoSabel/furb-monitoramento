@@ -50,6 +50,17 @@ function WebSocketManager(login, password, onConnect, onMessage, onDisconect, on
 			}));
 		}
 	}
+	
+	/**
+	 * Faz uma consulta para verifica o estado da conexão
+	 */
+	this.mensagemVerificacao = function(socket) {
+		//this.setRelay(socket.ip, 0);
+        socket.send(JSON.stringify({
+	        URL: '/relay',
+	        Method: 'GET'
+    	}));
+	}
 
 	this.desligar = function(ip, status) {
 		if (socket = getSocket(ip)) {
@@ -82,12 +93,11 @@ function WebSocketManager(login, password, onConnect, onMessage, onDisconect, on
 
 		if (document.getElementById(ip) == null) {
 			$("#EspStatus").append(
-				"<div class='EspStatus'><div>IP:" + ip + "<div><div class='EspLog' id='" + ip + "'></div>");
+				"<div class='EspStatus'><div>IP:" + ip + " - MacAddress: " + macAddress + "<div><div class='EspLog' id='" + ip + "'></div>");
 		}
 
 		socket.log = function(msg, tipo) {
-			document.getElementById(ip).innerHTML += '<div class="' + tipo
-					+ '">' + msg + '  Data: ' + getHora() + '</div>';
+			document.getElementById(ip).innerHTML += '<div class="'  + tipo + '">' + getHora() + " " + msg + '</div>';
 		};
 
 		socket.onopen = function() {
