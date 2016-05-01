@@ -1,5 +1,3 @@
-var configuracoes = JSON.parse('<?php echo $configJson; ?>');
-
 var contador = 0;
 var total = 0;
 

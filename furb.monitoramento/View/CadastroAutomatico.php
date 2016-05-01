@@ -4,7 +4,8 @@
 	$configJson = json_encode($configuracao);
 ?>
 
-<script src="Resources/cadastroAutomatico.js"></script>
+<script>var configuracoes = JSON.parse('<?php echo $configJson; ?>');</script>
+<script src="Js/cadastroAutomatico.js"></script>
 
 <div class="status"></div>
 <table class='tabela' style="width: 100%" id="DispositivosEncontratos">
@@ -16,9 +17,6 @@
 		<th>Observação</th>
 	</tr>
 </table>
-<br>
-<div id="EspStatus"></div>
-
 <?php
 $pagemaincontent = ob_get_contents ();
 ob_end_clean ();

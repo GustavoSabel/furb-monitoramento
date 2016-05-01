@@ -1,6 +1,6 @@
 <?php ob_start(); ?>
 
-<script src="Resources/cadastroManual.js"></script>
+<script src="Js/cadastroManual.js"></script>
 
 <div>
 	<form id="formCadastro" action="" method="post"> 

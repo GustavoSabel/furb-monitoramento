@@ -1,8 +1,8 @@
 <html>
 <head>
-<script src="Resources/webSocket.js"></script>
-<script src="Resources/commons.js"></script>
-<script src="Resources/jquery-2.2.2.min.js"></script>
+<script src="Js/webSocket.js"></script>
+<script src="Js/commons.js"></script>
+<script src="Js/jquery-2.2.2.min.js"></script>
 <link rel="stylesheet" type="text/css" href="Resources/estilo.css">
 <title><?php echo $titulo;?></title>
 </head>
@@ -20,5 +20,7 @@
             echo $pagemaincontent;
           ?>
         </div>
+        <br>
+        <div id="EspStatus"></div>
 </body>
 </html>

@@ -4,26 +4,7 @@
 	$configuracao = Buscar();
 ?>
 
-<script>
-$(function(){
-	$("#configuracoes").submit(function( event ) {
-		$("#status").html("");
-
-		var dados = {};
-		dados["operacao"] = "atualizar";
-		dados["login"] = $("#login").val();
-		dados["senha"] = $("#senha").val();
-		dados["tempo"] = $("#tempo").val();
-		var dadosJson = JSON.stringify(dados);
-		
-		$.post(path_configuracoes, dadosJson, function (data){
-			exibirMensagem(data.mensagem, data.status);
-			atualizarGrid();
-		}, 'json');
-		event.preventDefault();
-	});
-});
-</script>
+<script src="Js/configuracoes.js"></script>
 
 <div>
 	<form id="configuracoes" action="Teste.php" method="post">
@@ -45,7 +26,6 @@ $(function(){
 		<input type="text" name="tempo" id="tempo" autocomplete="off" value='<?php echo $configuracao->TempoDesligamento ?>'> <br> 
 		<input type="submit" Value="Cadastrar" />
 	</form>
-	<div id="status"></div>
 </div>
 
 <?php

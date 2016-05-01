@@ -8,9 +8,8 @@
 	var configuracoes = JSON.parse('<?php echo $configJson; ?>');
 </script>
 
-<script src="Resources/monitoramento.js"></script>
-<link rel="stylesheet" type="text/css"
-	href="Resources/monitoramento.css">
+<script src="Js/monitoramento.js"></script>
+<link rel="stylesheet" type="text/css" href="Resources/monitoramento.css">
 
 <button onClick="buscarDispositivos()">
 	Buscar novamente <span class="tooltip"> <img
@@ -34,9 +33,6 @@
 		<th>Sensor</th>
 	</tr>
 </table>
-<br>
-<br>
-<div id="EspStatus"></div>
 
 <?php
 $pagemaincontent = ob_get_contents ();
