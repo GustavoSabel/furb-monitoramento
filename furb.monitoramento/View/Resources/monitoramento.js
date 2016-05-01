@@ -243,6 +243,7 @@ function aoReceberMensagem(event, socket) {
 		}
 		else{
 			atualizarStatusByMac(socket.macAddress, null, null, null, "Problema no sensor");
+			addHistoricoByMac(socket.macAddress, "Problema no sensor: " + resultado["EventData"]["Error"], "Problema no sensor");
 			console.log("Problema no Mod-io2. ");
 		}
 	}
