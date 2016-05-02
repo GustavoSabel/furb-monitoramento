@@ -29,15 +29,15 @@ IRsend irsend;
 decode_results results;
 
 struct Comando {
-  char id;
+  int id;
   // Storage for the recorded code
   int codeType = -1; // The type of code
   unsigned long codeValue; // The code value if not raw
   unsigned int rawCodes[RAWBUF]; // The durations if raw
   int codeLen; // The length of the code
   char toggle = 0; // The RC5/6 toggle state
-  char verificarCorrente = 0; //Se tiver com 1, deve-se verificar se existe corrente antes de enviar o sinal
-};
+  int verificarCorrente = 0; //Se tiver com 1, deve-se verificar se existe corrente antes de enviar o sinal
+} comando;
 
 void setup() {
   Serial.begin(9600);
@@ -49,10 +49,10 @@ void setup() {
   pinMode(STATUS_PIN, OUTPUT); 
   pinMode(PIN_ESP8266, INPUT);
 
-  Serial.println("INICIANDO SISTEMA....");
-
   //Pino, calibracao - Cur Const= Ratio/BurdenR. 2000/33 = 60
   energyMonitor.current(PIN_SENSOR_CORRENTE, 60);
+
+  Serial.println("SISTEMA INICIADO");
 }
 
 //Convert *results em um comando
@@ -60,11 +60,11 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
   Serial.print("Salvando o comando ");
   Serial.println(comandoId);
   comando->id = comandoId;
-  
+  comando->verificarCorrente = digitalRead(PIN_VERIFICADOR) == HIGH;
   comando->codeType = results->decode_type;
   int count = results->rawlen;
   int isRawCode = 0;
-  if (comando->codeType == UNKNOWN) {
+  /*if (comando->codeType == UNKNOWN) {
     Serial.println("Received unknown code, saving as raw");
     isRawCode = 1;
   } else if (comando->codeType == NEC) {
@@ -91,18 +91,19 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
   else if (comando->codeType == RC6) {
     Serial.print("Received RC6: ");
   } 
-  else {
+  else {*/
     Serial.print("Unexpected codeType ");
     Serial.println(comando->codeType, DEC);
     comando->codeType = UNKNOWN;
     isRawCode = 1;
-  }
+  /*}*/
   
-  if(isRawCode == 0) {
+  /*if(isRawCode == 0) {
     Serial.println(results->value, HEX);
     comando->codeValue = results->value;
     comando->codeLen = results->bits;
-  } else {
+  } else {*/
+    comando->codeValue = -1;
     comando->codeLen = results->rawlen - 1;
     
     // To store raw codes:
@@ -113,7 +114,7 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
       comando->rawCodes[i - 1] = results->rawbuf[i] * USECPERTICK - MARK_EXCESS;
     }
     printCodigoBruto(comando);
-  }
+  /*}*/
 }
 
 void printCodigoBruto(Comando *command) {
@@ -135,7 +136,7 @@ void enviarCodigo(int repeat, Comando *comando) {
   Serial.print("Enviando o comando ");
   Serial.print(comando->id);
   Serial.print(": ");
-  if (comando->codeType == NEC) {
+  /*if (comando->codeType == NEC) {
     if (repeat) {
       irsend.sendNEC(REPEAT, comando->codeLen);
       Serial.println("Sent NEC repeat");
@@ -178,7 +179,7 @@ void enviarCodigo(int repeat, Comando *comando) {
       Serial.print("Sent RC6 ");
       Serial.println(comando->codeValue, HEX);
     }
-  } else if (comando->codeType == UNKNOWN /* i.e. raw */) {
+  } else if (comando->codeType == UNKNOWN) {
     // Assume 38 KHz
     irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
     delay(50);
@@ -187,12 +188,12 @@ void enviarCodigo(int repeat, Comando *comando) {
     irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
     Serial.println("Emitindo codigo IR bruto");
     printCodigoBruto(comando);
-  } else {
+  } else {*/
     // Assume 38 KHz
     irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
-    Serial.println("Emitindo codigo IR bruto - Alienigena");    
+    Serial.println("Emitindo codigo IR bruto");    
     printCodigoBruto(comando);
-  }
+  /*}*/
 }
 
 void gravarNoEEPRON(Comando *command){
@@ -201,10 +202,12 @@ void gravarNoEEPRON(Comando *command){
   EEPROM.put(addr, CODE_EEPROM);
   addr += sizeof(long);
   EEPROM.put(addr, command->id);
-  addr += sizeof(char);
+  addr += sizeof(int);
   EEPROM.put(addr, command->codeType);
   addr += sizeof(int);
   EEPROM.put(addr, command->codeLen);
+  addr += sizeof(int);
+  EEPROM.put(addr, command->verificarCorrente);
   addr += sizeof(int);
   if(command->codeType != UNKNOWN) {
     EEPROM.put(addr, command->codeValue);
@@ -217,25 +220,8 @@ void gravarNoEEPRON(Comando *command){
   }
 }
 
-//Retorna 1 se o comando está salvo na memória EEPROM
-//Retorna 0 caso não esteja
-int comandoEstaSalvo(int comandoId) {
-  long code_eepron = 0;
-  int addr = comandoId * ESPACO_RESERVADO_EEPROM;
-  Serial.println(EEPROM.get(addr, code_eepron));
-  addr += sizeof(long);
-  if(code_eepron != CODE_EEPROM) {
-    Serial.println("O comando ");
-    Serial.print(comandoId);
-    Serial.println(" não está salvo na memória");
-    return 0;
-  } else {
-    return 1;
-  }
-}
-
 //Busca o comando salvo na memória
-void carregarComandoEEPRON(Comando *command, int comandoId) {
+void carregarComandoEEPRON(int comandoId, Comando *command) {
   Serial.println("Buscando comando da memoria");
 
   int addr = comandoId * ESPACO_RESERVADO_EEPROM;
@@ -245,7 +231,7 @@ void carregarComandoEEPRON(Comando *command, int comandoId) {
   Serial.print(addr);
   Serial.print(" - id: ");
   Serial.println(EEPROM.get(addr, command->id));
-  addr += sizeof(char);
+  addr += sizeof(int);
 
   Serial.print(addr);
   Serial.print(" - codeType: ");
@@ -256,7 +242,12 @@ void carregarComandoEEPRON(Comando *command, int comandoId) {
   Serial.print(" - codeLen: ");
   Serial.println(EEPROM.get(addr, command->codeLen));
   addr += sizeof(int);
-  
+
+  Serial.print(addr);
+  Serial.print(" - verificarCorrente: ");
+  Serial.println(EEPROM.get(addr, command->verificarCorrente));
+  addr += sizeof(int);
+
   if(command->codeType != UNKNOWN) {
     Serial.print(addr);
     Serial.print(" - codeValue: ");
@@ -276,6 +267,23 @@ void carregarComandoEEPRON(Comando *command, int comandoId) {
   }
   Serial.print(addr);
   Serial.println(" - fim");
+}
+
+//Retorna 1 se o comando está salvo na memória EEPROM
+//Retorna 0 caso não esteja
+int comandoEstaSalvo(int comandoId) {
+  long code_eepron = 0;
+  int addr = comandoId * ESPACO_RESERVADO_EEPROM;
+  Serial.println(EEPROM.get(addr, code_eepron));
+  addr += sizeof(long);
+  if(code_eepron != CODE_EEPROM) {
+    Serial.println("O comando ");
+    Serial.print(comandoId);
+    Serial.println(" não está salvo na memória");
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
 //Retorna 1 se tiver corrente maior que 1 ampere
@@ -338,17 +346,15 @@ void loop() {
     }
     if (irrecv.decode(&results)) {
       if(button1State == HIGH){
-        Serial.println("A");
         digitalWrite(STATUS_PIN, HIGH);
-		    struct Comando comando;
+		    //struct Comando comando;
         criarComando(&results, COMANDO_1, &comando);
 		    gravarNoEEPRON(&comando);
         digitalWrite(STATUS_PIN, LOW);
       }
       if(button2State == HIGH){
-        Serial.println("B");
         digitalWrite(STATUS_PIN, HIGH);
-		    struct Comando comando;
+		    //struct Comando comando;
         criarComando(&results, COMANDO_2, &comando);
 		    gravarNoEEPRON(&comando);
         digitalWrite(STATUS_PIN, LOW);
@@ -367,21 +373,20 @@ void validarEnviarComando(int comandoId) {
   //Serial.println();
   //Se esse pino estiver em alto, então deve-se verificar se existe corrente antes de mandar o comando
   //TODO: Armazenar no comando se o mesmo deve verificar a corrente ou não
-  if(1 == 1 || digitalRead(PIN_VERIFICADOR) == LOW || temCorrente()) {
-    if(comandoEstaSalvo(comandoId)) {
-      struct Comando comando;
-      carregarComandoEEPRON(&comando, comandoId);
+  if(comandoEstaSalvo(comandoId)) {
+    //struct Comando comando;
+    carregarComandoEEPRON(comandoId, &comando);
+    if(!comando.verificarCorrente || temCorrente()) {
       digitalWrite(STATUS_PIN, HIGH);
       enviarCodigo(0, &comando);
       digitalWrite(STATUS_PIN, LOW);
       delay(50); // Wait a bit between retransmissions
-    }
-    else{
-      Serial.print("Nenhum comando salvo para o botao ");
-      Serial.println(comandoId);
+    } else {
+      Serial.println("Sem corrente para enviar o sinal");
     }
   } else {
-    Serial.println("Sem corrente para enviar o sinal");
+    Serial.print("Nenhum comando salvo para o botao ");
+    Serial.println(comandoId);
   }
   Serial.print("FIM COMANDO ");
   Serial.println(comandoId);
