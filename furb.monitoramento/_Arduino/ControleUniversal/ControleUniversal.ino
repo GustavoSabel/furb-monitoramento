@@ -7,7 +7,7 @@ EnergyMonitor energyMonitor;
 int REDE = 220; //Tensao da rede eletrica
 int PIN_SENSOR_CORRENTE = A1; //Pino do sensor de corrente
 int PIN_STATUS_SENSOR_CORRENTE = 13;
-double LIMITE_CORRENTE = 0.05; //Se ultrapassar esse valor, significa que tem corrente
+double LIMITE_CORRENTE = 0.08; //Se ultrapassar esse valor, significa que tem corrente
 
 int ESPACO_RESERVADO_EEPROM = 500; //Espaço que cada comando ocupará
 int COMANDO_1 = 0; //Posição da memória em que ficará salvo
@@ -81,6 +81,7 @@ void loop() {
     }
     
     if(lastButtonEsp8266State < 100 && buttonEsp8266State > 400) {
+      Serial.println("Recebi comando do ESP8266");
       validarEnviarComando(COMANDO_1);
       validarEnviarComando(COMANDO_2);
     } else if (lastButton1State == LOW && button1State == HIGH) {
@@ -196,7 +197,8 @@ void printCodigoBruto(Comando *command) {
 
 
 void validarEnviarComando(int comandoId) {
-  Serial.print("ENVIANDO COMANDO " + comandoId);
+  Serial.print("ENVIANDO COMANDO ");
+  Serial.println(comandoId);
   //Serial.println();
   //Se esse pino estiver em alto, então deve-se verificar se existe corrente antes de mandar o comando
   //TODO: Armazenar no comando se o mesmo deve verificar a corrente ou não
@@ -204,6 +206,8 @@ void validarEnviarComando(int comandoId) {
     //struct Comando comando;
     carregarComandoEEPRON(comandoId, &comando);
     if(!comando.verificarCorrente || temCorrente) {
+      if(comando.verificarCorrente)
+        Serial.println("Tem corrente para enviar o comando");
       digitalWrite(STATUS_PIN, HIGH);
       enviarCodigo(0, &comando);
       digitalWrite(STATUS_PIN, LOW);
@@ -219,8 +223,6 @@ void validarEnviarComando(int comandoId) {
     Serial.print("Nenhum comando salvo para o botao ");
     Serial.println(comandoId);
   }
-  Serial.print("FIM COMANDO ");
-  Serial.println(comandoId);
 }
 
 void enviarCodigo(int repeat, Comando *comando) {  

@@ -6,6 +6,6 @@ int verificarCorrente() {
   if(Irms > LIMITE_CORRENTE) {
     saida = 1;
   }
-  Serial.println(Irms);
+  //Serial.println(Irms);
   return saida;
 }

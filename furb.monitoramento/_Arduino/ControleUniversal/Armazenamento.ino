@@ -31,45 +31,51 @@ void carregarComandoEEPRON(int comandoId, Comando *command) {
   //Pula o código de verificação
   addr += sizeof(long);
 
-  Serial.print(addr);
-  Serial.print(" - id: ");
-  Serial.println(EEPROM.get(addr, command->id));
+  //Serial.print(addr);
+  //Serial.print(" - id: ");
+  EEPROM.get(addr, command->id);
+  //Serial.println(command->id);
   addr += sizeof(int);
 
-  Serial.print(addr);
-  Serial.print(" - codeType: ");
-  Serial.println(EEPROM.get(addr, command->codeType));
+  //Serial.print(addr);
+  //Serial.print(" - codeType: ");
+  EEPROM.get(addr, command->codeType);
+  //Serial.println(command->codeType);
   addr += sizeof(int);
   
-  Serial.print(addr);
-  Serial.print(" - codeLen: ");
-  Serial.println(EEPROM.get(addr, command->codeLen));
+  //Serial.print(addr);
+  //Serial.print(" - codeLen: ");
+  EEPROM.get(addr, command->codeLen);
+  //Serial.println(command->codeLen);
   addr += sizeof(int);
 
-  Serial.print(addr);
-  Serial.print(" - verificarCorrente: ");
-  Serial.println(EEPROM.get(addr, command->verificarCorrente));
+  //Serial.print(addr);
+  //Serial.print(" - verificarCorrente: ");
+  EEPROM.get(addr, command->verificarCorrente);
+  //Serial.println(command->verificarCorrente);
   addr += sizeof(int);
 
   if(command->codeType != UNKNOWN) {
-    Serial.print(addr);
-    Serial.print(" - codeValue: ");
-    Serial.println(EEPROM.get(addr, command->codeValue));
+    //Serial.print(addr);
+    //Serial.print(" - codeValue: ");
+    EEPROM.get(addr, command->codeValue);
+    //Serial.println(command->codeValue);
     addr += sizeof(long);
     
-    Serial.print(addr);
-    Serial.print(" - toggle: ");
-    Serial.println(EEPROM.get(addr, command->toggle));
+    //Serial.print(addr);
+    //Serial.print(" - toggle: ");
+    EEPROM.get(addr, command->toggle);
+    //Serial.println(command->toggle);
     addr += sizeof(char);
   } else {
-    Serial.print(addr);
-    Serial.print(" - rawCode: ");
+    //Serial.print(addr);
+    //Serial.print(" - rawCode: ");
     EEPROM.get(addr, command->rawCodes);
     addr += sizeof(int) * RAWBUF;
-    printCodigoBruto(command);
+    //printCodigoBruto(command);
   }
-  Serial.print(addr);
-  Serial.println(" - fim");
+  //Serial.print(addr);
+  //Serial.println(" - fim");
 }
 
 //Retorna 1 se o comando está salvo na memória EEPROM
@@ -77,10 +83,10 @@ void carregarComandoEEPRON(int comandoId, Comando *command) {
 int comandoEstaSalvo(int comandoId) {
   long code_eepron = 0;
   int addr = comandoId * ESPACO_RESERVADO_EEPROM;
-  Serial.println(EEPROM.get(addr, code_eepron));
+  EEPROM.get(addr, code_eepron);
   addr += sizeof(long);
   if(code_eepron != CODE_EEPROM) {
-    Serial.println("O comando ");
+    Serial.print("O comando ");
     Serial.print(comandoId);
     Serial.println(" não está salvo na memória");
     return 0;
