@@ -6,6 +6,7 @@
 EnergyMonitor energyMonitor;
 int REDE = 220; //Tensao da rede eletrica
 int PIN_SENSOR_CORRENTE = A1; //Pino do sensor de corrente
+int PIN_STATUS_SENSOR_CORRENTE = 13;
 double LIMITE_CORRENTE = 0.05; //Se ultrapassar esse valor, significa que tem corrente
 
 int ESPACO_RESERVADO_EEPROM = 500; //Espaço que cada comando ocupará
@@ -31,6 +32,7 @@ int lastButton1State;
 int lastButton2State;
 int lastButtonLearnState;
 int lastButtonEsp8266State;
+int temCorrente;
 
 struct Comando {
   int id;
@@ -48,11 +50,12 @@ void setup() {
   irrecv.enableIRIn(); // Start the receiver
   pinMode(BUTTON_1, INPUT);
   pinMode(BUTTON_2, INPUT);
-  pinMode(PIN_SENSOR_CORRENTE, INPUT);
   pinMode(BUTTON_LEARN, INPUT);
-  pinMode(STATUS_PIN, OUTPUT); 
+  pinMode(STATUS_PIN, OUTPUT);
   pinMode(PIN_ESP8266, INPUT);
 
+  pinMode(PIN_SENSOR_CORRENTE, INPUT);
+  pinMode(PIN_STATUS_SENSOR_CORRENTE, OUTPUT); 
   //Pino, calibracao - Cur Const= Ratio/BurdenR. 2000/33 = 60
   energyMonitor.current(PIN_SENSOR_CORRENTE, 60);
 
@@ -64,6 +67,13 @@ void loop() {
   int button2State = digitalRead(BUTTON_2);
   int buttonLearnState = digitalRead(BUTTON_LEARN);
   int buttonEsp8266State = analogRead(PIN_ESP8266);
+  temCorrente = verificarCorrente();
+  
+  if(temCorrente) {
+    digitalWrite(PIN_STATUS_SENSOR_CORRENTE, HIGH);
+  } else {
+    digitalWrite(PIN_STATUS_SENSOR_CORRENTE, LOW);
+  }
 
   if(buttonLearnState == LOW){
     if (lastButtonLearnState == HIGH) {
@@ -193,7 +203,7 @@ void validarEnviarComando(int comandoId) {
   if(comandoEstaSalvo(comandoId)) {
     //struct Comando comando;
     carregarComandoEEPRON(comandoId, &comando);
-    if(!comando.verificarCorrente || temCorrente()) {
+    if(!comando.verificarCorrente || temCorrente) {
       digitalWrite(STATUS_PIN, HIGH);
       enviarCodigo(0, &comando);
       digitalWrite(STATUS_PIN, LOW);
