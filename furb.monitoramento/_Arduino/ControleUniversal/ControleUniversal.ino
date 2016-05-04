@@ -25,8 +25,12 @@ char PIN_ESP8266 = A4; //Quando esse pino for maior que 500, então deve enviar 
 
 IRrecv irrecv(RECV_PIN);
 IRsend irsend;
-
 decode_results results;
+
+int lastButton1State;
+int lastButton2State;
+int lastButtonLearnState;
+int lastButtonEsp8266State;
 
 struct Comando {
   int id;
@@ -53,6 +57,54 @@ void setup() {
   energyMonitor.current(PIN_SENSOR_CORRENTE, 60);
 
   Serial.println("SISTEMA INICIADO");
+}
+
+void loop() {
+  int button1State = digitalRead(BUTTON_1);
+  int button2State = digitalRead(BUTTON_2);
+  int buttonLearnState = digitalRead(BUTTON_LEARN);
+  int buttonEsp8266State = analogRead(PIN_ESP8266);
+
+  if(buttonLearnState == LOW){
+    if (lastButtonLearnState == HIGH) {
+      Serial.println("Busca por sinal IR finalizada");
+    }
+    
+    if(lastButtonEsp8266State < 100 && buttonEsp8266State > 400) {
+      validarEnviarComando(COMANDO_1);
+      validarEnviarComando(COMANDO_2);
+    } else if (lastButton1State == LOW && button1State == HIGH) {
+      validarEnviarComando(COMANDO_1);
+    } else if (lastButton2State == LOW && button2State == HIGH) {
+      validarEnviarComando(COMANDO_2);
+    } 
+  } else {
+    if (lastButtonLearnState == LOW) {
+      Serial.println("Aguardando sinal IR");
+      irrecv.enableIRIn(); // Re-enable receiver
+    }
+    if (irrecv.decode(&results)) {
+      if(button1State == HIGH){
+        digitalWrite(STATUS_PIN, HIGH);
+        //struct Comando comando;
+        criarComando(&results, COMANDO_1, &comando);
+        gravarNoEEPRON(&comando);
+        digitalWrite(STATUS_PIN, LOW);
+      }
+      if(button2State == HIGH){
+        digitalWrite(STATUS_PIN, HIGH);
+        //struct Comando comando;
+        criarComando(&results, COMANDO_2, &comando);
+        gravarNoEEPRON(&comando);
+        digitalWrite(STATUS_PIN, LOW);
+      }
+      irrecv.resume(); // resume receiver
+    }
+  }
+  lastButton1State = button1State;
+  lastButton2State = button2State;
+  lastButtonLearnState = buttonLearnState;
+  lastButtonEsp8266State = buttonEsp8266State;
 }
 
 //Convert *results em um comando
@@ -132,6 +184,35 @@ void printCodigoBruto(Comando *command) {
   Serial.println(" bytes");
 }
 
+
+void validarEnviarComando(int comandoId) {
+  Serial.print("ENVIANDO COMANDO " + comandoId);
+  //Serial.println();
+  //Se esse pino estiver em alto, então deve-se verificar se existe corrente antes de mandar o comando
+  //TODO: Armazenar no comando se o mesmo deve verificar a corrente ou não
+  if(comandoEstaSalvo(comandoId)) {
+    //struct Comando comando;
+    carregarComandoEEPRON(comandoId, &comando);
+    if(!comando.verificarCorrente || temCorrente()) {
+      digitalWrite(STATUS_PIN, HIGH);
+      enviarCodigo(0, &comando);
+      digitalWrite(STATUS_PIN, LOW);
+      delay(3000);
+      digitalWrite(STATUS_PIN, HIGH);
+      enviarCodigo(0, &comando);
+      digitalWrite(STATUS_PIN, LOW);
+      delay(50);
+    } else {
+      Serial.println("Sem corrente para enviar o sinal");
+    }
+  } else {
+    Serial.print("Nenhum comando salvo para o botao ");
+    Serial.println(comandoId);
+  }
+  Serial.print("FIM COMANDO ");
+  Serial.println(comandoId);
+}
+
 void enviarCodigo(int repeat, Comando *comando) {  
   Serial.print("Enviando o comando ");
   Serial.print(comando->id);
@@ -194,201 +275,5 @@ void enviarCodigo(int repeat, Comando *comando) {
     Serial.println("Emitindo codigo IR bruto");    
     printCodigoBruto(comando);
   /*}*/
-}
-
-void gravarNoEEPRON(Comando *command){
-  Serial.println("Salvando comandos na memoria");   
-  int addr = command->id * ESPACO_RESERVADO_EEPROM;
-  EEPROM.put(addr, CODE_EEPROM);
-  addr += sizeof(long);
-  EEPROM.put(addr, command->id);
-  addr += sizeof(int);
-  EEPROM.put(addr, command->codeType);
-  addr += sizeof(int);
-  EEPROM.put(addr, command->codeLen);
-  addr += sizeof(int);
-  EEPROM.put(addr, command->verificarCorrente);
-  addr += sizeof(int);
-  if(command->codeType != UNKNOWN) {
-    EEPROM.put(addr, command->codeValue);
-    addr += sizeof(long);
-    EEPROM.put(addr, command->toggle);
-    addr += sizeof(char);
-  } else {
-    EEPROM.put(addr, command->rawCodes);
-    addr += sizeof(int) * RAWBUF;
-  }
-}
-
-//Busca o comando salvo na memória
-void carregarComandoEEPRON(int comandoId, Comando *command) {
-  Serial.println("Buscando comando da memoria");
-
-  int addr = comandoId * ESPACO_RESERVADO_EEPROM;
-  //Pula o código de verificação
-  addr += sizeof(long);
-
-  Serial.print(addr);
-  Serial.print(" - id: ");
-  Serial.println(EEPROM.get(addr, command->id));
-  addr += sizeof(int);
-
-  Serial.print(addr);
-  Serial.print(" - codeType: ");
-  Serial.println(EEPROM.get(addr, command->codeType));
-  addr += sizeof(int);
-  
-  Serial.print(addr);
-  Serial.print(" - codeLen: ");
-  Serial.println(EEPROM.get(addr, command->codeLen));
-  addr += sizeof(int);
-
-  Serial.print(addr);
-  Serial.print(" - verificarCorrente: ");
-  Serial.println(EEPROM.get(addr, command->verificarCorrente));
-  addr += sizeof(int);
-
-  if(command->codeType != UNKNOWN) {
-    Serial.print(addr);
-    Serial.print(" - codeValue: ");
-    Serial.println(EEPROM.get(addr, command->codeValue));
-    addr += sizeof(long);
-    
-    Serial.print(addr);
-    Serial.print(" - toggle: ");
-    Serial.println(EEPROM.get(addr, command->toggle));
-    addr += sizeof(char);
-  } else {
-    Serial.print(addr);
-    Serial.print(" - rawCode: ");
-    EEPROM.get(addr, command->rawCodes);
-    addr += sizeof(int) * RAWBUF;
-    printCodigoBruto(command);
-  }
-  Serial.print(addr);
-  Serial.println(" - fim");
-}
-
-//Retorna 1 se o comando está salvo na memória EEPROM
-//Retorna 0 caso não esteja
-int comandoEstaSalvo(int comandoId) {
-  long code_eepron = 0;
-  int addr = comandoId * ESPACO_RESERVADO_EEPROM;
-  Serial.println(EEPROM.get(addr, code_eepron));
-  addr += sizeof(long);
-  if(code_eepron != CODE_EEPROM) {
-    Serial.println("O comando ");
-    Serial.print(comandoId);
-    Serial.println(" não está salvo na memória");
-    return 0;
-  } else {
-    return 1;
-  }
-}
-
-//Retorna 1 se tiver corrente maior que 1 ampere
-int temCorrente() {
-  int saida = 0;
-  //Calcula a corrente
-  double Irms = 0;
-  //Calcula algumas vezes antes para descarregar o capacitor
-  int x = 4;
-  Serial.println("Descarregando capacitor");
-  while(x-- > 0) {
-    Irms = energyMonitor.calcIrms(1480);
-    Serial.print(Irms);
-    Serial.print(" ");
-    delay(50);
-  }
-  Serial.println(" descarregado");
-  Irms = energyMonitor.calcIrms(1480);
-  delay(10);
-  if(Irms > LIMITE_CORRENTE) {
-    Serial.print("TEM CORRENTE:");
-    saida = 1;
-  } else {
-    Serial.print("NAO TEM CORRENTE:");
-  }
-  delay(10);
-  Serial.println(Irms);
-  delay(10);
-  return saida;
-}
-
-int lastButton1State;
-int lastButton2State;
-int lastButtonLearnState;
-int lastButtonEsp8266State;
-
-void loop() {
-  int button1State = digitalRead(BUTTON_1);
-  int button2State = digitalRead(BUTTON_2);
-  int buttonLearnState = digitalRead(BUTTON_LEARN);
-  int buttonEsp8266State = analogRead(PIN_ESP8266);
-
-  if(buttonLearnState == LOW){
-    if (lastButtonLearnState == HIGH) {
-      Serial.println("Busca por sinal IR finalizada");
-    }
-    
-    if(lastButtonEsp8266State < 100 && buttonEsp8266State > 400) {
-      validarEnviarComando(COMANDO_1);
-      validarEnviarComando(COMANDO_2);
-    } else if (lastButton1State == LOW && button1State == HIGH) {
-      validarEnviarComando(COMANDO_1);
-    } else if (lastButton2State == LOW && button2State == HIGH) {
-      validarEnviarComando(COMANDO_2);
-    } 
-  } else {
-    if (lastButtonLearnState == LOW) {
-      Serial.println("Aguardando sinal IR");
-      irrecv.enableIRIn(); // Re-enable receiver
-    }
-    if (irrecv.decode(&results)) {
-      if(button1State == HIGH){
-        digitalWrite(STATUS_PIN, HIGH);
-		    //struct Comando comando;
-        criarComando(&results, COMANDO_1, &comando);
-		    gravarNoEEPRON(&comando);
-        digitalWrite(STATUS_PIN, LOW);
-      }
-      if(button2State == HIGH){
-        digitalWrite(STATUS_PIN, HIGH);
-		    //struct Comando comando;
-        criarComando(&results, COMANDO_2, &comando);
-		    gravarNoEEPRON(&comando);
-        digitalWrite(STATUS_PIN, LOW);
-      }
-      irrecv.resume(); // resume receiver
-    }
-  }
-  lastButton1State = button1State;
-  lastButton2State = button2State;
-  lastButtonLearnState = buttonLearnState;
-  lastButtonEsp8266State = buttonEsp8266State;
-}
-
-void validarEnviarComando(int comandoId) {
-  Serial.print("ENVIANDO COMANDO " + comandoId);
-  //Serial.println();
-  //Se esse pino estiver em alto, então deve-se verificar se existe corrente antes de mandar o comando
-  //TODO: Armazenar no comando se o mesmo deve verificar a corrente ou não
-  if(comandoEstaSalvo(comandoId)) {
-    //struct Comando comando;
-    carregarComandoEEPRON(comandoId, &comando);
-    if(!comando.verificarCorrente || temCorrente()) {
-      digitalWrite(STATUS_PIN, HIGH);
-      enviarCodigo(0, &comando);
-      digitalWrite(STATUS_PIN, LOW);
-      delay(50); // Wait a bit between retransmissions
-    } else {
-      Serial.println("Sem corrente para enviar o sinal");
-    }
-  } else {
-    Serial.print("Nenhum comando salvo para o botao ");
-    Serial.println(comandoId);
-  }
-  Serial.print("FIM COMANDO ");
-  Serial.println(comandoId);
 }
 
