@@ -127,7 +127,7 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
   comando->codeType = results->decode_type;
   int count = results->rawlen;
   int isRawCode = 0;
-  /*if (comando->codeType == UNKNOWN) {
+  if (comando->codeType == UNKNOWN) {
     Serial.println("Received unknown code, saving as raw");
     isRawCode = 1;
   } else if (comando->codeType == NEC) {
@@ -138,34 +138,28 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
       return;
     }
     Serial.println(results->value, HEX);
-  } 
-  else if (comando->codeType == SONY) {
+  } else if (comando->codeType == SONY) {
     Serial.print("Received SONY: ");
-  } 
-  else if (comando->codeType == PANASONIC) {
+  } else if (comando->codeType == PANASONIC) {
     Serial.print("Received PANASONIC: ");
-  }
-  else if (comando->codeType == JVC) {
+  } else if (comando->codeType == JVC) {
     Serial.print("Received JVC: ");
-  }
-  else if (comando->codeType == RC5) {
+  } else if (comando->codeType == RC5) {
     Serial.print("Received RC5: ");
-  } 
-  else if (comando->codeType == RC6) {
+  } else if (comando->codeType == RC6) {
     Serial.print("Received RC6: ");
-  } 
-  else {*/
+  } else {
     Serial.print("Unexpected codeType ");
     Serial.println(comando->codeType, DEC);
     comando->codeType = UNKNOWN;
     isRawCode = 1;
-  /*}*/
+  }
   
-  /*if(isRawCode == 0) {
+  if(isRawCode == 0) {
     Serial.println(results->value, HEX);
     comando->codeValue = results->value;
     comando->codeLen = results->bits;
-  } else {*/
+  } else {
     comando->codeValue = -1;
     comando->codeLen = results->rawlen - 1;
     
@@ -177,11 +171,11 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
       comando->rawCodes[i - 1] = results->rawbuf[i] * USECPERTICK - MARK_EXCESS;
     }
     printCodigoBruto(comando);
-  /*}*/
+  }
 }
 
 void printCodigoBruto(Comando *command) {
-  /*for (int i = 1; i <= command->codeLen; i++) {
+  for (int i = 1; i <= command->codeLen; i++) {
     if (i % 2) {
       Serial.print(" m"); // Mark
     } 
@@ -190,9 +184,9 @@ void printCodigoBruto(Comando *command) {
     }
     Serial.print(command->rawCodes[i - 1], DEC);
   }
-  Serial.println("");*/
-  Serial.print(command->codeLen);
-  Serial.println(" bytes");
+  Serial.println("");
+  /*Serial.print(command->codeLen);
+  Serial.println(" bytes");*/
 }
 
 
@@ -229,17 +223,16 @@ void enviarCodigo(int repeat, Comando *comando) {
   Serial.print("Enviando o comando ");
   Serial.print(comando->id);
   Serial.print(": ");
-  /*if (comando->codeType == NEC) {
+  if (comando->codeType == NEC) {
     if (repeat) {
       irsend.sendNEC(REPEAT, comando->codeLen);
       Serial.println("Sent NEC repeat");
-    } 
-    else {
+    } else {
       irsend.sendNEC(comando->codeValue, comando->codeLen);
       Serial.print("Sent NEC ");
       Serial.println(comando->codeValue, HEX);
     }
-  } 
+  }/* 
   else if (comando->codeType == SONY) {
     irsend.sendSony(comando->codeValue, comando->codeLen);
     Serial.print("Sent Sony ");
@@ -281,11 +274,11 @@ void enviarCodigo(int repeat, Comando *comando) {
     irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
     Serial.println("Emitindo codigo IR bruto");
     printCodigoBruto(comando);
-  } else {*/
+   }*/ else {
     // Assume 38 KHz
     irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
     Serial.println("Emitindo codigo IR bruto");    
     printCodigoBruto(comando);
-  /*}*/
+  }
 }
 
