@@ -127,6 +127,7 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
   comando->codeType = results->decode_type;
   int count = results->rawlen;
   int isRawCode = 0;
+  
   if (comando->codeType == UNKNOWN) {
     Serial.println("Received unknown code, saving as raw");
     isRawCode = 1;
@@ -163,10 +164,10 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
     comando->codeValue = -1;
     comando->codeLen = results->rawlen - 1;
     
-    // To store raw codes:
-    // Drop first value (gap)
-    // Convert from ticks to microseconds
-    // Tweak marks shorter, and spaces longer to cancel out IR receiver distortion
+    // Para armazenar os dados brutos:
+    // Descartar o primeiro valor;
+    // converter para microsegundos;
+    // Tweak marks shorter, and spaces longer to cancel out IR receiver distortion;
     for (int i = 1; i <= comando->codeLen; i++) {
       comando->rawCodes[i - 1] = results->rawbuf[i] * USECPERTICK - MARK_EXCESS;
     }
@@ -205,7 +206,10 @@ void validarEnviarComando(int comandoId) {
       digitalWrite(STATUS_PIN, HIGH);
       enviarCodigo(0, &comando);
       digitalWrite(STATUS_PIN, LOW);
-      delay(3000);
+      //Aguarda alguns segundos para depois enviar o comando novamente
+      //Isso é necessário caso o aparelho que se deseja desligar seja um projetor.
+      //Para desligar o projeto é preciso enviar o comando de desligar duas vezes.
+      delay(2000); 
       digitalWrite(STATUS_PIN, HIGH);
       enviarCodigo(0, &comando);
       digitalWrite(STATUS_PIN, LOW);
@@ -223,32 +227,9 @@ void enviarCodigo(int repeat, Comando *comando) {
   Serial.print("Enviando o comando ");
   Serial.print(comando->id);
   Serial.print(": ");
-  if (comando->codeType == NEC) {
-    if (repeat) {
-      irsend.sendNEC(REPEAT, comando->codeLen);
-      Serial.println("Sent NEC repeat");
-    } else {
-      irsend.sendNEC(comando->codeValue, comando->codeLen);
-      Serial.print("Sent NEC ");
-      Serial.println(comando->codeValue, HEX);
-    }
-  }/* 
-  else if (comando->codeType == SONY) {
-    irsend.sendSony(comando->codeValue, comando->codeLen);
-    Serial.print("Sent Sony ");
-    Serial.println(comando->codeValue, HEX);
-  } 
-  else if (comando->codeType == PANASONIC) {
-    irsend.sendPanasonic(comando->codeValue, comando->codeLen);
-    Serial.print("Sent Panasonic");
-    Serial.println(comando->codeValue, HEX);
-  }
-  else if (comando->codeType == JVC) {
-    irsend.sendPanasonic(comando->codeValue, comando->codeLen);
-    Serial.print("Sent JVC");
-    Serial.println(comando->codeValue, HEX);
-  }
-  else if (comando->codeType == RC5 || comando->codeType == RC6) {
+
+#if (DECODE_RC5 || DECODE_RC6)
+  if (comando->codeType == RC5 || comando->codeType == RC6) {
     if (!repeat) {
       // Flip the toggle bit for a new button press
       comando->toggle = 1 - comando->toggle;
@@ -265,20 +246,56 @@ void enviarCodigo(int repeat, Comando *comando) {
       Serial.print("Sent RC6 ");
       Serial.println(comando->codeValue, HEX);
     }
-  } else if (comando->codeType == UNKNOWN) {
-    // Assume 38 KHz
-    irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
-    delay(50);
-    irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
-    delay(50);
-    irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
-    Serial.println("Emitindo codigo IR bruto");
-    printCodigoBruto(comando);
-   }*/ else {
-    // Assume 38 KHz
-    irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
-    Serial.println("Emitindo codigo IR bruto");    
-    printCodigoBruto(comando);
+    return;
   }
+#endif
+
+//Projeto da marca EPSON utiliza esse tipo de código
+#if DECODE_NEC
+  if (comando->codeType == NEC) {
+    if (repeat) {
+      irsend.sendNEC(REPEAT, comando->codeLen);
+      Serial.println("Sent NEC repeat");
+    } else {
+      irsend.sendNEC(comando->codeValue, comando->codeLen);
+      Serial.print("Sent NEC ");
+      Serial.println(comando->codeValue, HEX);
+    }
+    return;
+  }
+#endif
+
+#if DECODE_SONY
+  if (comando->codeType == SONY) {
+    irsend.sendSony(comando->codeValue, comando->codeLen);
+    Serial.print("Sent Sony ");
+    Serial.println(comando->codeValue, HEX);
+    return;
+  } 
+#endif
+
+#if DECODE_PANASONIC
+  if (comando->codeType == PANASONIC) {
+    irsend.sendPanasonic(comando->codeValue, comando->codeLen);
+    Serial.print("Sent Panasonic");
+    Serial.println(comando->codeValue, HEX);
+    return;
+  }
+#endif
+
+#if DECODE_JVC
+  if (comando->codeType == JVC) {
+    irsend.sendPanasonic(comando->codeValue, comando->codeLen);
+    Serial.print("Sent JVC");
+    Serial.println(comando->codeValue, HEX);
+    return;
+  }
+#endif
+
+  //Enviar comando bruto
+  //Assume 38 KHz
+  irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
+  Serial.println("Emitindo codigo IR bruto");    
+  printCodigoBruto(comando);
 }
 
