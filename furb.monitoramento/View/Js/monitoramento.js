@@ -20,8 +20,8 @@ var VERIFICAR_SENSOR = true;
  * 		socket, 
  * 		macAddress [Endereço mac], 
  * 		ultimoMovimento [Data do último movimento identificado pelo sensor], 
- * 		ultimaStatusSensorRecebido [Última data de recebimento do status do sensor], 
- * 		ultimaStatusSensorRequisitado [Data da última requisição de status para sensor]
+ * 		ultimoStatusSensorRecebido [Última data de recebimento do status do sensor],
+ * 		dataUltimoDesligamento [Se o comando desligar foi enviado, será armazenada a data em que foi feita. Ao voltar a ter movimento na sala, esse campo é zerado]
  * }
  */
 var dispositivos = [];
@@ -203,7 +203,7 @@ function desligar(mac) {
 	var ip = getIpByMac(mac);
 	webSocketManager.desligar(ip);
 	
-	addHistoricoByMac(mac, "Enviado comando para desligar", "Desligando");
+	addHistoricoByMac(mac, "Enviado comando para desligar", "Desligado");
 }
 
 function conectar(ip) {
@@ -213,22 +213,20 @@ function conectar(ip) {
 	atualizarStatusByMac(mac, DISP_CONECTANDO, "Conectando...", socket.ip);
 }
 
-
 /**
- * Verifica se o último status do sensor expirou, ou seja, 
- * retorna true se faz muito tempo desde a última consulta feita ao sensor
- * @param ip
- * @returns {Boolean}
+ * Verifica se o último status do sensor expirou, 
+ * ou seja, retorna true se faz muito tempo desde a última consulta feita ao sensor
  */
 function sensorExpirou(ip) {
-	return dispositivos[ip]["ultimaStatusSensorRecebido"] != null 
-	&& ((Date.now() - dispositivos[ip]["ultimaStatusSensorRecebido"]) > TEMPO_VERIFICACAO_CONEXAO_SENSOR);
+	return dispositivos[ip]["ultimoStatusSensorRecebido"] != null 
+	&& ((Date.now() - dispositivos[ip]["ultimoStatusSensorRecebido"]) > TEMPO_EXPIRACAO_SENSOR);
 }
 
 function atualizarSensor(socket, statusSensor) {
 	if(statusSensor == 1){
 		statusSensor = "Com movimento";
 		dispositivos[socket.ip]["ultimoMovimento"] = Date.now();
+		dispositivos[socket.ip]["dataUltimoDesligamento"] = null;
 	} else  {
 		//Se a última consulta ao sensor foi a muito tempo, então deve-se zerar o tempo
 		if(dispositivos[socket.ip]["ultimoMovimento"] == null || sensorExpirou(socket.ip)) {
@@ -238,8 +236,9 @@ function atualizarSensor(socket, statusSensor) {
 		segundosSemMovimento = Math.round(segundosSemMovimento*100)/100;
 		statusSensor = segundosSemMovimento + "s sem movimento"
 		
-		if(segundosSemMovimento > configuracoes["TempoDesligamento"]) {
-			dispositivos[socket.ip]["ultimoMovimento"] = Date.now();
+		if(dispositivos[socket.ip]["dataUltimoDesligamento"] == null && 
+				segundosSemMovimento > configuracoes["TempoDesligamento"]) {
+			dispositivos[socket.ip]["dataUltimoDesligamento"] = Date.now();
 			addHistoricoByMac(socket.macAddress, "Ficou muito tempo sem movimento. Será desligado", "Será desligado");
 			desligar(socket.macAddress);
 		}
@@ -247,16 +246,7 @@ function atualizarSensor(socket, statusSensor) {
 
 	atualizarStatusByMac(socket.macAddress, null, null, null, statusSensor);
 	
-	/*dispositivos[socket.ip]["ultimaStatusSensorRecebido"] = Date.now();
-	var diferencaTempo = 0;
-	if(dispositivos[socket.ip]["ultimaStatusSensorRequisitado"] != null) {
-		diferencaTempo = Date.now() - dispositivos[socket.ip]["ultimaStatusSensorRequisitado"];
-	}
-	setTimeout(function(){
-			dispositivos[socket.ip]["ultimaStatusSensorRequisitado"] = Date.now();
-			webSocketManager.consultarSensor(socket.ip);
-		}, DELAY_CONSULTAS_SENSOR - diferencaTempo);*/
-	
+	dispositivos[socket.ip]["ultimoStatusSensorRecebido"] = Date.now();
 }
 
 function aoReceberMensagem(event, socket) {	
