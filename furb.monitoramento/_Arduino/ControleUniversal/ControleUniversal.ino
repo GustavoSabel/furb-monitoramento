@@ -167,16 +167,23 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
     // Para armazenar os dados brutos:
     // Descartar o primeiro valor;
     // converter para microsegundos;
-    // Tweak marks shorter, and spaces longer to cancel out IR receiver distortion;
+    // Deixa as marcas menores e o espaços maiores para diminuir a distorção do receptor
     for (int i = 1; i <= comando->codeLen; i++) {
-      comando->rawCodes[i - 1] = results->rawbuf[i] * USECPERTICK - MARK_EXCESS;
+      if (i % 2) {
+        // Mark
+        comando->rawCodes[i - 1] = results->rawbuf[i]*USECPERTICK - MARK_EXCESS;
+      } 
+      else {
+        // Space
+        comando->rawCodes[i - 1] = results->rawbuf[i]*USECPERTICK + MARK_EXCESS;
+      }
     }
     printCodigoBruto(comando);
   }
 }
 
 void printCodigoBruto(Comando *command) {
-  for (int i = 1; i <= command->codeLen; i++) {
+  /*for (int i = 1; i <= command->codeLen; i++) {
     if (i % 2) {
       Serial.print(" m"); // Mark
     } 
@@ -185,14 +192,18 @@ void printCodigoBruto(Comando *command) {
     }
     Serial.print(command->rawCodes[i - 1], DEC);
   }
-  Serial.println("");
-  /*Serial.print(command->codeLen);
-  Serial.println(" bytes");*/
+  Serial.println("");*/
+  Serial.print(command->codeLen);
+  Serial.println(" bytes");
 }
 
-
+//Verifica se o comando está salvo em memória
+//Verifica se o comando só deve ser enviado se ter corrente elétrica
+//Se sim, verifica se tem corrente. Se ter corrente, envia o comando
+//Se não precisa verificar a existencia de corrente, apenas envia o comando
+//O comando será enviado duas vezes, com um pequeno tempo entre os envios
 void validarEnviarComando(int comandoId) {
-  Serial.print("ENVIANDO COMANDO ");
+  Serial.print("Preparando para enviar o comando ");
   Serial.println(comandoId);
   //Serial.println();
   //Se esse pino estiver em alto, então deve-se verificar se existe corrente antes de mandar o comando
@@ -205,6 +216,8 @@ void validarEnviarComando(int comandoId) {
         Serial.println("Tem corrente para enviar o comando");
       digitalWrite(STATUS_PIN, HIGH);
       enviarCodigo(0, &comando);
+      delay(50);
+      enviarCodigo(REPEAT, &comando);
       digitalWrite(STATUS_PIN, LOW);
       //Aguarda alguns segundos para depois enviar o comando novamente
       //Isso é necessário caso o aparelho que se deseja desligar seja um projetor.
@@ -212,6 +225,8 @@ void validarEnviarComando(int comandoId) {
       delay(2000); 
       digitalWrite(STATUS_PIN, HIGH);
       enviarCodigo(0, &comando);
+      delay(50);
+      enviarCodigo(REPEAT, &comando);
       digitalWrite(STATUS_PIN, LOW);
       delay(50);
     } else {
