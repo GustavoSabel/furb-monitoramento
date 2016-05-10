@@ -190,8 +190,8 @@ function addHistoricoByLinha(linha, historico, historico_resumido) {
 	var span = document.createElement("span");
 	var textNode = document.createTextNode(getHora() + " - " + historico);
 	span.appendChild(textNode);
-	elemento.appendChild(span);
-	elemento.appendChild(document.createElement("br"));
+	elemento.insertBefore(document.createElement("br"), elemento.firstChild);
+	elemento.insertBefore(span, elemento.firstChild);
 }
 
 function toggleRelay(relay, mac) {
@@ -203,6 +203,7 @@ function desligar(mac) {
 	var ip = getIpByMac(mac);
 	webSocketManager.desligar(ip);
 	
+	dispositivos[socket.ip]["dataUltimoDesligamento"] = Date.now();
 	addHistoricoByMac(mac, "Enviado comando para desligar", "Desligado");
 }
 
@@ -226,7 +227,11 @@ function atualizarSensor(socket, statusSensor) {
 	if(statusSensor == 1){
 		statusSensor = "Com movimento";
 		dispositivos[socket.ip]["ultimoMovimento"] = Date.now();
-		dispositivos[socket.ip]["dataUltimoDesligamento"] = null;
+		
+		if(dispositivos[socket.ip]["dataUltimoDesligamento"] != null) {
+			addHistoricoByMac(socket.macAddress, "Voltou a detectar movimento.", "Mov. detectado");
+			dispositivos[socket.ip]["dataUltimoDesligamento"] = null;
+		}
 	} else  {
 		//Se a última consulta ao sensor foi a muito tempo, então deve-se zerar o tempo
 		if(dispositivos[socket.ip]["ultimoMovimento"] == null || sensorExpirou(socket.ip)) {
@@ -238,8 +243,7 @@ function atualizarSensor(socket, statusSensor) {
 		
 		if(dispositivos[socket.ip]["dataUltimoDesligamento"] == null && 
 				segundosSemMovimento > configuracoes["TempoDesligamento"]) {
-			dispositivos[socket.ip]["dataUltimoDesligamento"] = Date.now();
-			addHistoricoByMac(socket.macAddress, "Ficou muito tempo sem movimento. Será desligado", "Será desligado");
+			addHistoricoByMac(socket.macAddress, "Ficou mais de " + segundosSemMovimento + "s sem movimento. Será enviado o comando para desligar os aparelhos", "Será desligado");
 			desligar(socket.macAddress);
 		}
 	}
