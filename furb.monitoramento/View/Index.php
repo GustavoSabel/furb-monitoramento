@@ -8,21 +8,14 @@
 	var configuracoes = JSON.parse('<?php echo $configJson; ?>');
 </script>
 
-<script src="Js/monitoramento.js"></script>
-<link rel="stylesheet" type="text/css" href="Resources/monitoramento.css">
+<button class="btn btn-primary" data-toggle="tooltip" title="
+			Caso alguns dispositivos não tenham sido encontrados, ao clicar nesse comando será feita uma nova busca na rede para encontrá-los. Os dispositivos já encontrados não sofrerãoimpacto." 
+			onClick="buscarDispositivos()">
+	Buscar novamente </button>
 
-<button onClick="buscarDispositivos()">
-	Buscar novamente <span class="tooltip"> <img
-		src="Resources/Imagens/help.png" alt="help" /> <span
-		class="tooltiptext"> Caso alguns dispositivos não tenham sido
-			encontrados, ao clicar nesse comando será feita uma nova busca na
-			rede para encontrá-los. Os dispositivos já encontrados não sofrerão
-			impacto. </span>
-	</span>
-</button>
-<!--  <button onClick="ConectarNovamente()">Tentar conectar novamente</button> -->
-<table id="TabelaMonitoriamento">
-	<tr>
+<table class="table col-sm-12" id="TabelaMonitoriamento">
+	<thead>
+	  <tr>
 		<th class='colMac'>Mac Addrress</th>
 		<th class='colStatus'>Status</th>
 		<th class='colHistorio'>Histórico</th>
@@ -32,6 +25,8 @@
 		<th class='colComandos'>Comandos</th>
 		<th class='colSensor'>Sensor</th>
 	</tr>
+	</thead>
+	<tbody></tbody>
 </table>
 
 <?php

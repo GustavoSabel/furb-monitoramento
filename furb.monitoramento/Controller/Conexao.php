@@ -1,11 +1,11 @@
-<?php
+﻿<?php
 	class Conexao {
 		public static function Abrir() {
 			// definições de host, database, usuário e senha 
 			$host = "localhost"; 
 			$db = "furb_monitoramento"; 
-			$user = "gsabel"; 
-			$pass = "329019"; 
+			$user = "root"; 
+			$pass = ""; 
 			// conecta ao banco de dados 
 			$conn = new mysqli($host, $user, $pass, $db); 
 			if ($conn->connect_error) {

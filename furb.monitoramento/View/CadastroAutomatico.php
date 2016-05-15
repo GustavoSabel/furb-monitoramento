@@ -8,15 +8,20 @@
 <script src="Js/cadastroAutomatico.js"></script>
 
 <div class="status"></div>
-<table class='tabela' style="width: 100%" id="DispositivosEncontratos">
-	<tr>
-		<th>Comando</th>
-		<th>Mac Address</th>
-		<th>IP</th>
-		<th>Local</th>
-		<th>Observação</th>
-	</tr>
+
+<table class="table col-sm-12" id="DispositivosEncontratos">
+	<thead>
+	  	<tr>
+			<th>Comando</th>
+			<th>Mac Address</th>
+			<th>IP</th>
+			<th>Local</th>
+			<th>Observação</th>
+		</tr>
+	</thead>
+	<tbody></tbody>
 </table>
+
 <?php
 $pagemaincontent = ob_get_contents ();
 ob_end_clean ();
