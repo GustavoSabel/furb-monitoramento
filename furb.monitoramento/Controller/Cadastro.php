@@ -1,8 +1,8 @@
 <?php
 require_once '../Model/Dispositivos.php';
 
-define("STATUS_SUCESSO", 1);
-define("STATUS_FALHA", 0);
+define ( "STATUS_SUCESSO", 1 );
+define ( "STATUS_FALHA", 0 );
 
 $dados = json_decode ( file_get_contents ( 'php://input' ), true );
 $operacao = $dados ["operacao"];
@@ -30,21 +30,26 @@ if ($operacao == "cadastrar") {
 function Cadastrar($MacAddress, $Local, $observacao) {
 	$resultado = array ();
 	$resultado ['status'] = STATUS_FALHA;
-	if ($MacAddress == null || trim ( $MacAddress ) == "") {
-		$resultado ['mensagem'] = "Mac Address não informado";
-	} else {
-		$dispositivos = new Dispositivos ();
-		$resultado = $dispositivos->Buscar ( null, $MacAddress );
-		if (count ( $resultado ) > 0) {
-			$resultado ['mensagem'] = "Mac Address $MacAddress já cadastrado em $Local";
+	try {
+		if ($MacAddress == null || trim ( $MacAddress ) == "") {
+			$resultado ['mensagem'] = "Mac Address não informado";
 		} else {
-			if (($result = $dispositivos->Inserir ( $MacAddress, $Local, $observacao )) !== true) {
-				$resultado ['mensagem'] = $result;
+			$dispositivos = new Dispositivos ();
+			$consultaDisp = $dispositivos->Buscar ( null, $MacAddress );
+			if (count ( $consultaDisp ) > 0) {
+				$localDisCadastrado = $consultaDisp [0] [2];
+				$resultado ['mensagem'] = "Mac Address '$MacAddress' já cadastrado no local '$localDisCadastrado'";
 			} else {
-				$resultado ['status'] = STATUS_SUCESSO;
-				$resultado ['mensagem'] = 'Inserido com sucesso';
+				if (($result = $dispositivos->Inserir ( $MacAddress, $Local, $observacao )) !== true) {
+					$resultado ['mensagem'] = $result;
+				} else {
+					$resultado ['status'] = STATUS_SUCESSO;
+					$resultado ['mensagem'] = 'Inserido com sucesso';
+				}
 			}
 		}
+	} catch ( Exception $ex ) {
+		$resultado ['mensagem'] = $ex->getMessage ();
 	}
 	echo json_encode ( $resultado );
 }
@@ -59,7 +64,7 @@ function Editar($MacAddress, $Local, $observacao) {
 		if (count ( $resultado ) == 0) {
 			$resultado ['mensagem'] = "Mac Address '$MacAddress' ainda não foi cadastrado";
 		} else {
-			if (($result = $dispositivos->EditarPorMac( $MacAddress, $Local, $observacao )) !== true) {
+			if (($result = $dispositivos->EditarPorMac ( $MacAddress, $Local, $observacao )) !== true) {
 				$resultado ['mensagem'] = $result;
 			} else {
 				$resultado ['status'] = STATUS_SUCESSO;
@@ -71,7 +76,7 @@ function Editar($MacAddress, $Local, $observacao) {
 }
 function Buscar($mac = null) {
 	$dispositivos = new Dispositivos ();
-	$resultado = $dispositivos->Buscar (null, $mac);
+	$resultado = $dispositivos->Buscar ( null, $mac );
 	
 	echo json_encode ( $resultado );
 }
