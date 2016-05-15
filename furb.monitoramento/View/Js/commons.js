@@ -22,7 +22,14 @@ function getData() {
 }
 
 function exibirMensagem(mensagem, status) {
-	var tipo = (status == 1 ? 'success' : 'danger')
+	var tipo = ''
+	if(status == 1) {
+		tipo = 'success'
+	} else if (status == 0) {
+		tipo = 'danger'
+	} else {
+		tipo = 'warning'
+	}
 	$.notify(mensagem, {
 		type: tipo,
 		animate: {

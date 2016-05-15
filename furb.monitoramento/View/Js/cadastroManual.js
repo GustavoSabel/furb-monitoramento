@@ -68,13 +68,13 @@ function editar(id) {
 function ativarModoEditao() {
 	editando = true;
 	$("#macaddress").prop('readonly', true);
-	$("#btnCadastrar").val("Gravar alteração");
+	$("#btnCadastrar").html("Gravar alteração");
 }
 
 function ativarModoCadastro(){
 	editando = false;
 	$("#macaddress").prop('readonly', false);
-	$("#btnCadastrar").val("Cadastrar");
+	$("#btnCadastrar").html("Cadastrar");
 }
 
 function montarBotaoRemover(id) {
