@@ -22,6 +22,7 @@ function getData() {
 }
 
 function exibirMensagem(mensagem, status) {
+	mensagem = '<div class="alert alert-info">'+ mensagem + '</div>';
 	$("#mensagensSistema").fadeIn();
 	$("#mensagensSistema").html(mensagem);
 	if (status == 1) {
