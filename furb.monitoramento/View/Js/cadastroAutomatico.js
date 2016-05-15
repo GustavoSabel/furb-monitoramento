@@ -1,5 +1,7 @@
 var contador = 0;
 var total = 0;
+var qtdEncontrados = 0;
+var notify;
 
 $(function(){
 	var webSocketManager = new WebSocketManager(
@@ -7,11 +9,16 @@ $(function(){
 			configuracoes["Senha"], 
 			aoConectar);
 	
+	qtdEncontrados = 0;
+	
 	$.post(path_consulta, "{}", function (data){
 		console.log(data);
 		total = Object.keys(data).length;
 		if(total > 0) {
-			exibirMensagem("Procurando... Verificados 0 de " + total);
+			notify = $.notify('<strong>Procurando...</strong> Verificados 0 de ' + total, {
+				allow_dismiss: false,
+				delay: 3600000
+			});
 			for(var ip in data) {
 				webSocketManager.conectar(ip, data[ip]);
 			}
@@ -24,11 +31,22 @@ $(function(){
 function aoConectar (sucesso, socket) {
 	if(sucesso) {
 		addAoGrid(socket.macAddress, socket.ip);
+		qtdEncontrados++;
 	}
 	contador++;
-	exibirMensagem("Procurando... Verificados " + contador + " de " + total);
+	notify.update({
+		'message': '<strong>Procurando...</strong> Verificados ' + contador + ' de ' + total});
 	if(contador == total){
-		exibirMensagem("Busca finalizada");
+		var msgEncontrados;
+		if(qtdEncontrados == 0)
+			msgEncontrados = "Nenhum encontrato"
+		else
+			msgEncontrados = "Foram encontratos " + qtdEncontrados + " dispositivos";
+			
+		notify.update({
+			'message': '<strong>Procura finalizada</strong> ' + msgEncontrados,
+			allow_dismiss: true,
+			type:'success'});
 	}
 }
 
