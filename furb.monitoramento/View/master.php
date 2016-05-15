@@ -2,14 +2,14 @@
 <head>
 <script src="Js/webSocket.js"></script>
 <script src="Js/commons.js"></script>
-<script src="Js/jquery-2.2.2.min.js"></script>
 
+<script src="lib/jquery-2.2.3.min.js"></script>
 <link rel="stylesheet" type="text/css" href="lib/bootstrap-3.3.6.min.css">
 <script type="text/javascript" src="lib/bootstrap-3.3.6.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap-notify.min.js"></script>
 
-<script src="Js/monitoramento.js"></script>
-<link rel="stylesheet" type="text/css" href="Resources/monitoramento.css">
 <link rel="stylesheet" type="text/css" href="Resources/main.css">
+<link rel="stylesheet" type="text/css" href="lib/animate.css">
 
 <!--<link rel="stylesheet" type="text/css" href="Resources/estilo.css">-->
 <title><?php echo $titulo;?></title>
@@ -26,7 +26,7 @@
         <a class="navbar-brand" href="Configuracoes.php">Configurações</a>
 	</nav>
 
-	<div id="mensagensSistema"></div>
+	<div id="mensagensSistema" class="alert-dismissible"></div>
 
 	<div id="conteudo">
       <?php

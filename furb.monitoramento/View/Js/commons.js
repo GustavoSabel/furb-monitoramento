@@ -22,12 +22,12 @@ function getData() {
 }
 
 function exibirMensagem(mensagem, status) {
-	mensagem = '<div class="alert alert-info">'+ mensagem + '</div>';
-	$("#mensagensSistema").fadeIn();
-	$("#mensagensSistema").html(mensagem);
-	if (status == 1) {
-		$("#mensagensSistema").attr("class", "ok");
-	} else if (status == 0) {
-		$("#mensagensSistema").attr("class", "erro");
-	}
+	var tipo = (status == 1 ? 'success' : 'danger')
+	$.notify(mensagem, {
+		type: tipo,
+		animate: {
+			enter: 'animated fadeInRight',
+			exit: 'animated fadeOutRight'
+		}
+	});
 }

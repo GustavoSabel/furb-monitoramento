@@ -11,7 +11,7 @@ $(function() {
 
 		$.post(path_configuracoes, dadosJson, function(data) {
 			exibirMensagem(data.mensagem, data.status);
-			atualizarGrid();
+			//atualizarGrid();
 		}, 'json');
 		event.preventDefault();
 	});

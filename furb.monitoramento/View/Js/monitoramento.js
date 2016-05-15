@@ -5,8 +5,8 @@ var DISP_CONECTADO = 'conectado';
 var DISP_CONECTANDO = 'conectando';
 var DISP_NAO_CONECTADO = 'naoconectado';
 
-//Indica o tempo máximo que o sistema pode ficar sem consultar o sensor de movimento
-//se a última consulta ao sensor de movimento ultrapassar esse tempo, então o cronômetro
+//Indica o tempo máximo que o sistema pode ficar sem consultar o sensor de movimento.
+//Se a última consulta ao sensor de movimento ultrapassar esse tempo, então o cronômetro
 //do dispositivo deve ser zerado
 var TEMPO_EXPIRACAO_SENSOR = 1000*60*4; //4 minutos
 var TEMPO_VERIFICACAO_CONEXAO = 10000

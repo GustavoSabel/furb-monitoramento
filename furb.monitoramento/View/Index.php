@@ -4,6 +4,9 @@
 	$configJson = json_encode($configuracao);
 ?>
 
+<script src="Js/monitoramento.js"></script>
+<link rel="stylesheet" type="text/css" href="Resources/monitoramento.css">
+
 <script>
 	var configuracoes = JSON.parse('<?php echo $configJson; ?>');
 </script>
