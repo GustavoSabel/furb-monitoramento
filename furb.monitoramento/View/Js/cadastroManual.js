@@ -78,11 +78,11 @@ function ativarModoCadastro(){
 }
 
 function montarBotaoRemover(id) {
-	return "<button class='comando excluir' onClick='remover(\"" + id + "\")'>Remover</button>";
+	return "<button class='btn btn-danger btn-sm' onClick='remover(\"" + id + "\")'>Remover</button>";
 }
 
 function montarBotaoEditar(id) {
-	return "<button class='comando editar' onClick='editar(\"" + id + "\")'>Editar</button>";
+	return "<button class='btn btn-success btn-sm' onClick='editar(\"" + id + "\")'>Editar</button>";
 }
 
 function atualizarGrid() {
@@ -98,7 +98,7 @@ function atualizarGrid() {
 		var linhas = "";
 		data.forEach(function(row) {
 			linhas += "<tr class='dispositivo' id='" + row[0] + "'>";
-			linhas += "<td>" + montarBotaoRemover(row[0]) + montarBotaoEditar(row[0]) + "</td>";
+			linhas += "<td>" + montarBotaoEditar(row[0]) + " " + montarBotaoRemover(row[0]) + "</td>";
 			linhas += "<td>" + row[1] + "</td>";
 			linhas += "<td>" + row[2] + "</td>";
 			linhas += "<td>" + row[3] + "</td>";

@@ -65,7 +65,7 @@ function SimularArpScan() {
 	  "192.168.1.103 0c:84:dc:ff:35:a9 (Unknown)",
 	  "192.168.1.104 f4:f1:e1:13:db:6b (Unknown)",
 	  "192.168.1.105 f4:f1:e1:13:db:6b (Unknown)",
-	  "192.168.1.108 18:fe:34:a1:f5:a7 (Unknown)",
+	  "192.168.1.109 18:fe:34:a1:f5:a7 (Unknown)",
 	  "192.168.1.101 18:fe:34:f5:d6:d3 (Unknown)",
 	  "",
 	  "6 packets received by filter, 0 packets dropped by kernel",

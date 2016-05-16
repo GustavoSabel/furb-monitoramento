@@ -104,11 +104,11 @@ function atualizarStatus(mac, estaCadastrado) {
 }
 
 function montarBotaoCadastrar(mac) {
-	return "<button class='comando cadastrar' onClick='cadastrar(\"" + mac + "\")'>Cadastrar</button>";
+	return "<button class='btn btn-success btn-sm' onClick='cadastrar(\"" + mac + "\")'>Cadastrar</button>";
 }
 
 function montarBotaoRemover(mac) {
-	return "<button class='comando excluir' onClick='remover(\"" + mac + "\")'>Remover</button>";
+	return "<button class='btn btn-danger btn-sm' onClick='remover(\"" + mac + "\")'>Remover</button>";
 }
 
 function addAoGrid(mac, ip) {
@@ -132,8 +132,8 @@ function addAoGrid(mac, ip) {
 			linhas += "<td>" + comando + "</td>"
 			linhas += "<td>" + mac + "</td>";
 			linhas += "<td>" + ip + "</td>";
-			linhas += "<td><input type='text' value='" + local + "' class='local' autocomplete='off'></td>";
-			linhas += "<td><input type='text' value='" + observacao + "' class='observacao' autocomplete='off'></td>";
+			linhas += "<td><input type='text' value='" + local + "' class='local form-control' autocomplete='off'></td>";
+			linhas += "<td><input type='text' value='" + observacao + "' class='observacao form-control' autocomplete='off'></td>";
 
 			linhas += "</tr>";
 			$("#DispositivosEncontratos").append(linhas);

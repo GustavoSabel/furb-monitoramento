@@ -5,6 +5,14 @@ var CLOSED = 3 // The connection is closed or couldn't be opened.
 
 function WebSocketManager(login, password, onConnect, onMessage, onDisconect, onError) {
 
+	var logView = 
+		"<div id='EspLog'>" +
+			"<button id='BtnEspStatus' data-toggle='collapse' class='btn btn-info btn-sm' data-target='#EspStatus'>Detalhes</button>" +
+			"<div id='EspStatus' class='collapse'></div>" +
+		"</div>";
+	
+	$("body").append(logView);
+	
 	var sockets = {};
 
 	function getSocket(ip) {

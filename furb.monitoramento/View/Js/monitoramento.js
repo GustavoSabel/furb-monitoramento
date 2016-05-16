@@ -76,7 +76,6 @@ function exibirCadastrados(callback) {
 	var dados = JSON.stringify({operacao:"buscar"});
 	console.log(dados);
 	$.post(path_cadastro, dados, function (data) {
-		//console.log(data);
 
 		$(".dispositivo").remove();
 		var linhas = "";
@@ -85,11 +84,11 @@ function exibirCadastrados(callback) {
 			linhas += "<tr class='"+ DISP_NAO_ENCONTRATO +"' id='"+ row[1].macToId() +"'>";
 			linhas += "<td class='macaddress'	>" + row[1] + "</td>";
 			linhas += "<td class='status'		> ... </td>";
-
+			
 			linhas += "<td class='historico'><span class='historico_ultimo'></span>";
-			linhas += "		<span class='tooltip  grande' > ";
+			linhas += "		<span class='logToolTip grande' > ";
 			linhas += "		<img src='Resources/Imagens/help.png' alt='help' /> ";
-			linhas += "		<span class='tooltiptext grande historico_tudo'></span>";
+			linhas += "		<span class='logToolTiptext grande historico_tudo'></span>";
 			linhas += "</td>";
 			
 			linhas += "<td class='ip'			> ... </td>";
@@ -97,15 +96,15 @@ function exibirCadastrados(callback) {
 			
 			linhas += "<td class='observacao'> ";
 			if(row[3] != "") {
-				linhas += "		<span class='tooltip'> ";
+				linhas += "		<span class='logToolTip'> ";
 				linhas += "		<img src='Resources/Imagens/help.png' alt='help' /> ";
-				linhas += "		<span class='tooltiptext'>" + row[3] + "</span>";
+				linhas += "		<span class='logToolTiptext'>" + row[3] + "</span>";
 			}
 			linhas += "</td>";
 			
 			linhas += "<td class='comandos'>";
-			linhas += "<input type='checkbox' name='relay' value='relay' onchange='toggleRelay(this, \""+ row[1]+"\")'/><span>Relay</span>";
-			linhas += "<button onClick='desligar(\""+ row[1] +"\")'>Desligar</button>";
+			linhas += "<input type='checkbox' name='relay' value='relay' onchange='toggleRelay(this, \""+ row[1]+"\")'/><span>Relay</span> ";
+			linhas += "<button class='btn btn-danger btn-sm' onClick='desligar(\""+ row[1] +"\")'>Desligar</button>";
 			linhas += "</td>";
 			
 			linhas += "<td class='sensor'> ... </td>";

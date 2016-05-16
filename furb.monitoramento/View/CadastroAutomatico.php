@@ -21,7 +21,6 @@
 	</thead>
 	<tbody></tbody>
 </table>
-
 <?php
 $pagemaincontent = ob_get_contents ();
 ob_end_clean ();

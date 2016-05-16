@@ -18,7 +18,7 @@
 
 	<div class="form-group col-sm-12">
 		<button type="submit" id="btnCadastrar" class="btn btn-success">Cadastrar</button>
-		<!-- <button id="btnCancelar" onClick="limpar()" class="btn btn-danger">Cancelar</button> -->
+		<button type="button" id="btnCancelar" onClick="limpar()" class="btn btn-danger">Cancelar</button>
 	</div>
 </form>
 
