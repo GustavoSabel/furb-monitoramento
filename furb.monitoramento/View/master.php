@@ -13,11 +13,13 @@
 <link rel="stylesheet" type="text/css" href="lib/animate.css">
 
 <!--<link rel="stylesheet" type="text/css" href="Resources/estilo.css">-->
-<title><?php echo $titulo;?></title>
+<title><?php echo $titulo;?> </title>
 </head>
 <body>
 	<div class="titulo_pagina">
-		<h1 id="titulo_pagina"><?php echo $titulo;?></h1>
+		<h1 id="titulo_pagina"><?php echo $titulo;?> </h1>
+		<img src="Resources/Imagens/logo-furb.gif" alt="FURB" class="logo_furb" /> 
+		<div class="clear"></div>
 	</div>
 
     <nav class="navbar navbar-light">
