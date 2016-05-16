@@ -7,8 +7,6 @@
 <script>var configuracoes = JSON.parse('<?php echo $configJson; ?>');</script>
 <script src="Js/cadastroAutomatico.js"></script>
 
-<div class="status"></div>
-
 <table class="table col-sm-12" id="DispositivosEncontratos">
 	<thead>
 	  	<tr>
@@ -21,6 +19,7 @@
 	</thead>
 	<tbody></tbody>
 </table>
+
 <?php
 $pagemaincontent = ob_get_contents ();
 ob_end_clean ();

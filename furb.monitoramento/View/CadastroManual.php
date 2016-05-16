@@ -5,11 +5,11 @@
 <form id="formCadastro" action="" method="post" role="form"> 
 	<div class="form-group col-sm-12">
 		<label for="macaddress">Mac Address:</label>
-		<input class="form-control" type="text" name="macaddress" id="macaddress" autocomplete="off">
+		<input class="form-control" type="text" name="macaddress" id="macaddress" autocomplete="off" required>
 	</div>
 	<div class="form-group col-sm-12">
 		<label for="localizacao">Localização:</label>
-		<input class="form-control" type="text" name="localizacao" id="localizacao" autocomplete="off">
+		<input class="form-control" type="text" name="localizacao" id="localizacao" autocomplete="off" required>
 	</div>
 	<div class="form-group col-sm-12">
 		<label for="observacao">Observação:</label>

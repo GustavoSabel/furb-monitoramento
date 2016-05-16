@@ -6,7 +6,7 @@
 
 <script src="Js/configuracoes.js"></script>
 
-<form id="configuracoes" action="Teste.php" method="post" role="form"> 
+<form id="configuracoes" action="" method="post" role="form"> 
 	<div class="form-group col-sm-12">
 		<label for="login">Mac Login:</label>
 		<input class="form-control" type="text" name="login" id="login" autocomplete="on" value='<?php echo $configuracao->Login ?>'> 
