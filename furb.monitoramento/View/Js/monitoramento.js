@@ -80,15 +80,29 @@ function exibirCadastrados(callback) {
 		$(".dispositivo").remove();
 		var linhas = "";
 		data.forEach(function(row) {	
-			
-			linhas += "<tr class='"+ DISP_NAO_ENCONTRATO +"' id='"+ row[1].macToId() +"'>";
-			linhas += "<td class='macaddress'	>" + row[1] + "</td>";
+			var macAdrress = row[1];
+			linhas += "<tr class='"+ DISP_NAO_ENCONTRATO +"' id='"+ macAdrress.macToId() +"'>";
+			linhas += "<td class='macaddress'	>" + macAdrress + "</td>";
 			linhas += "<td class='status'		> ... </td>";
+
 			
-			linhas += "<td class='historico'><span class='historico_ultimo'></span>";
-			linhas += "		<span class='logToolTip grande' > ";
-			linhas += "		<img src='Resources/Imagens/help.png' alt='help' /> ";
-			linhas += "		<span class='logToolTiptext grande historico_tudo'></span>";
+			linhas += "<td class='historico'>";
+			linhas += "		<span class='historico_ultimo'></span>";
+			linhas += "		<button class='btn btn-info btn-sm' data-toggle='modal' data-target='#log" + macAdrress.macToId() + "'>Log</button>";
+
+			linhas += "		<div class='modal fade bd-example-modal-lg' id='log" + macAdrress.macToId() + "' tabindex='-1' role='dialog' aria-labelledby='myLargeModalLabel' aria-hidden='true'>";
+			linhas += "  		<div class='modal-dialog modal-lg'>";
+			linhas += "    			<div class='modal-content'>";
+			linhas += "    				<div class='modal-header'>";
+			linhas += "    					<button type='button' class='close' data-dismiss='modal' aria-label='Close'>";
+			linhas += "    			  			<span aria-hidden='true'>&times;</span>";
+			linhas += "    					</button>";
+			linhas += "    					<h4 class='modal-title' id='myModalLabel'>Log do disposítivo do local '" + row[2] + "'</h4>";
+			linhas += "    			 	</div>";
+			linhas += "    				<div class='modal-body'></div>";
+			linhas += "    			</div>";
+			linhas += "  		</div>";
+			linhas += "		</div>";
 			linhas += "</td>";
 			
 			linhas += "<td class='ip'			> ... </td>";
@@ -96,9 +110,20 @@ function exibirCadastrados(callback) {
 			
 			linhas += "<td class='observacao'> ";
 			if(row[3] != "") {
-				linhas += "		<span class='logToolTip'> ";
-				linhas += "		<img src='Resources/Imagens/help.png' alt='help' /> ";
-				linhas += "		<span class='logToolTiptext'>" + row[3] + "</span>";
+				linhas += "		<button class='btn btn-info btn-sm' data-toggle='modal' data-target='#obs" + macAdrress.macToId() + "'>Ver obs</button>";
+				linhas += "		<div class='modal fade bd-example-modal-lg' id='obs" + macAdrress.macToId() + "' tabindex='-1' role='dialog' aria-labelledby='myLargeModalLabel' aria-hidden='true'>";
+				linhas += "  		<div class='modal-dialog modal-lg'>";
+				linhas += "    			<div class='modal-content'>";
+				linhas += "    				<div class='modal-header'>";
+				linhas += "    					<button type='button' class='close' data-dismiss='modal' aria-label='Close'>";
+				linhas += "    			  			<span aria-hidden='true'>&times;</span>";
+				linhas += "    					</button>";
+				linhas += "    					<h4 class='modal-title' id='myModalLabel'>Observações do disposítivo do local '" + row[2] + "'</h4>";
+				linhas += "    			 	</div>";
+				linhas += "    				<div class='modal-body'>" + row[3] + "</div>";
+				linhas += "    			</div>";
+				linhas += "  		</div>";
+				linhas += "		</div>";
 			}
 			linhas += "</td>";
 			
@@ -184,13 +209,13 @@ function addHistoricoByLinha(linha, historico, historico_resumido) {
 	else 
 		elemento.innerText = historico;
 	
-	var elemento = linha.querySelector("td.historico .historico_tudo");
+	var logContent = linha.querySelector("td.historico .modal-content .modal-body");
 	
 	var span = document.createElement("span");
 	var textNode = document.createTextNode(getHora() + " - " + historico);
 	span.appendChild(textNode);
-	elemento.insertBefore(document.createElement("br"), elemento.firstChild);
-	elemento.insertBefore(span, elemento.firstChild);
+	logContent.insertBefore(document.createElement("br"), logContent.firstChild);
+	logContent.insertBefore(span, logContent.firstChild);
 }
 
 function toggleRelay(relay, mac) {
