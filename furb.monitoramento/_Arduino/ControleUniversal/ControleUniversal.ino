@@ -7,7 +7,7 @@ EnergyMonitor energyMonitor;
 int REDE = 220; //Tensao da rede eletrica
 int PIN_SENSOR_CORRENTE = A1; //Pino do sensor de corrente
 int PIN_STATUS_SENSOR_CORRENTE = 13;
-double LIMITE_CORRENTE = 0.08; //Se ultrapassar esse valor, significa que tem corrente
+double LIMITE_CORRENTE = 0.15; //Se ultrapassar esse valor, significa que tem corrente
 
 int ESPACO_RESERVADO_EEPROM = 500; //Espaço que cada comando ocupará
 int COMANDO_1 = 0; //Posição da memória em que ficará salvo
@@ -54,10 +54,10 @@ void setup() {
   pinMode(STATUS_PIN, OUTPUT);
   pinMode(PIN_ESP8266, INPUT);
 
-  pinMode(PIN_SENSOR_CORRENTE, INPUT);
+  //pinMode(PIN_SENSOR_CORRENTE, INPUT);
   pinMode(PIN_STATUS_SENSOR_CORRENTE, OUTPUT); 
-  //Pino, calibracao - Cur Const= Ratio/BurdenR. 2000/33 = 60
-  energyMonitor.current(PIN_SENSOR_CORRENTE, 60);
+  //Pino, calibracao - Cur Const= Ratio/BurdenR. 1800/62 = 29. 
+  energyMonitor.current(PIN_SENSOR_CORRENTE, 29);
 
   Serial.println("SISTEMA INICIADO");
 }
