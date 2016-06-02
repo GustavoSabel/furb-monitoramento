@@ -42,7 +42,7 @@ function aoConectar (sucesso, socket) {
 			msgEncontrados = "Nenhum encontrato"
 		else
 			msgEncontrados = "Foram encontratos " + qtdEncontrados + " dispositivos";
-			
+		
 		notify.update({
 			'message': '<strong>Procura finalizada</strong> ' + msgEncontrados,
 			allow_dismiss: true,

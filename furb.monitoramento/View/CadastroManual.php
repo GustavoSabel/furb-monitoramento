@@ -3,17 +3,17 @@
 <script src="Js/cadastroManual.js"></script>
 
 <form id="formCadastro" action="" method="post" role="form"> 
-	<div class="form-group col-sm-12">
+	<div class="form-group col-sm-6">
 		<label for="macaddress">Mac Address:</label>
-		<input class="form-control" type="text" name="macaddress" id="macaddress" autocomplete="off" required>
+		<input class="form-control" placeholder="Ex: 18:fe:34:a1:f5:a7" type="text" name="macaddress" id="macaddress" autocomplete="off" required>
 	</div>
-	<div class="form-group col-sm-12">
+	<div class="form-group col-sm-6">
 		<label for="localizacao">Localização:</label>
-		<input class="form-control" type="text" name="localizacao" id="localizacao" autocomplete="off" required>
+		<input class="form-control" placeholder="Ex: Campus I - S427" type="text" name="localizacao" id="localizacao" autocomplete="off" required>
 	</div>
 	<div class="form-group col-sm-12">
 		<label for="observacao">Observação:</label>
-		<input class="form-control" type="text" name="observacao" id="observacao" autocomplete="off"> 
+		<textarea class="form-control" name="observacao" id="observacao" rows="4"></textarea> 
 	</div>
 
 	<div class="form-group col-sm-12">

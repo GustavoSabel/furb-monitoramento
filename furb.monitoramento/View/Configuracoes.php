@@ -7,15 +7,15 @@
 <script src="Js/configuracoes.js"></script>
 
 <form id="configuracoes" action="" method="post" role="form"> 
-	<div class="form-group col-sm-12">
-		<label for="login">Mac Login:</label>
+	<div class="form-group col-sm-4">
+		<label for="login">Login:</label>
 		<input class="form-control" type="text" name="login" id="login" autocomplete="on" value='<?php echo $configuracao->Login ?>'> 
 	</div>
-	<div class="form-group col-sm-12">
+	<div class="form-group col-sm-4">
 		<label for="senha">Senha:</label>
 		<input class="form-control" type="password" name="senha" id="senha" autocomplete="off" value='<?php echo $configuracao->Senha ?>'>
 	</div>
-	<div class="form-group col-sm-12">
+	<div class="form-group col-sm-4">
 		<label for="tempo">Tempo para desligar automaticamente: </label>
 
 		<span class="tooltip">

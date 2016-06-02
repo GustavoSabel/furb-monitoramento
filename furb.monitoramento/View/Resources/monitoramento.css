@@ -31,6 +31,11 @@
 	width: 300px;
 }
 
+#TabelaMonitoriamento td {
+	text-align: left;
+	vertical-align: middle;
+}
+
 #TabelaMonitoriamento tr.naoencontrado td.comandos *,
 	#TabelaMonitoriamento tr.naoconectado td.comandos *,
 	#TabelaMonitoriamento tr.conectando td.comandos *,
