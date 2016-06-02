@@ -27,6 +27,7 @@
         <a class="navbar-brand" href="CadastroManual.php">Cadastrar manualmente</a>
         <a class="navbar-brand" href="CadastroAutomatico.php">Cadastrar automaticamente</a>
         <a class="navbar-brand" href="Configuracoes.php">Configurações</a>
+		<a class="navbar-brand" href="../OlimexApp/index.html">Aplicação Olimex</a>
 	</nav>
 	
 	<div id="conteudo">
