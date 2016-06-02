@@ -101,7 +101,12 @@ function atualizarGrid() {
 			linhas += "<td>" + montarBotaoEditar(row[0]) + " " + montarBotaoRemover(row[0]) + "</td>";
 			linhas += "<td>" + row[1] + "</td>";
 			linhas += "<td>" + row[2] + "</td>";
-			linhas += "<td>" + row[3] + "</td>";
+			var obs = row[3];
+			var tamanhoMaximoObs = 100;
+			if(obs.length > tamanhoMaximoObs) {
+				obs = obs.substring(0, tamanhoMaximoObs - 3) + "...";
+			}
+			linhas += "<td>" + obs + "</td>";
 			linhas += "</tr>";
 		});
 

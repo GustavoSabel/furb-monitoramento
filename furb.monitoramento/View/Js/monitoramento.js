@@ -82,14 +82,17 @@ function exibirCadastrados(callback) {
 		data.forEach(function(row) {	
 			var macAdrress = row[1];
 			linhas += "<tr class='"+ DISP_NAO_ENCONTRATO +"' id='"+ macAdrress.macToId() +"'>";
+			
+			//------------ MAC ADDRESS ------------------
 			linhas += "<td class='macaddress'	>" + macAdrress + "</td>";
+			
+			//------------ STATUS ------------------
 			linhas += "<td class='status'		> ... </td>";
 
-			
+			//------------ HISTORICO ------------------
 			linhas += "<td class='historico'>";
 			linhas += "		<span class='historico_ultimo'></span>";
 			linhas += "		<button class='btn btn-info btn-sm' data-toggle='modal' data-target='#log" + macAdrress.macToId() + "'>Log</button>";
-
 			linhas += "		<div class='modal fade bd-example-modal-lg' id='log" + macAdrress.macToId() + "' tabindex='-1' role='dialog' aria-labelledby='myLargeModalLabel' aria-hidden='true'>";
 			linhas += "  		<div class='modal-dialog modal-lg'>";
 			linhas += "    			<div class='modal-content'>";
@@ -105,9 +108,13 @@ function exibirCadastrados(callback) {
 			linhas += "		</div>";
 			linhas += "</td>";
 			
+			//------------ IP ------------------
 			linhas += "<td class='ip'			> ... </td>";
+			
+			//------------ LOCAL ------------------
 			linhas += "<td class='local'		>" + row[2] + "</td>";
 			
+			//------------ OBSERVAÇÃO ------------------
 			linhas += "<td class='observacao'> ";
 			if(row[3] != "") {
 				linhas += "		<button class='btn btn-info btn-sm' data-toggle='modal' data-target='#obs" + macAdrress.macToId() + "'>Ver obs</button>";
@@ -120,18 +127,20 @@ function exibirCadastrados(callback) {
 				linhas += "    					</button>";
 				linhas += "    					<h4 class='modal-title' id='myModalLabel'>Observações do disposítivo do local '" + row[2] + "'</h4>";
 				linhas += "    			 	</div>";
-				linhas += "    				<div class='modal-body'>" + row[3] + "</div>";
+				linhas += "    				<div class='modal-body'>" + row[3].replace(/\n/g, "<br>"); + "</div>";
 				linhas += "    			</div>";
 				linhas += "  		</div>";
 				linhas += "		</div>";
 			}
 			linhas += "</td>";
 			
+			//------------ COMANDOS ------------------
 			linhas += "<td class='comandos'>";
 			linhas += "<input type='checkbox' name='relay' value='relay' onchange='toggleRelay(this, \""+ row[1]+"\")'/><span>Relay</span> ";
 			linhas += "<button class='btn btn-danger btn-sm' onClick='desligar(\""+ row[1] +"\")'>Desligar</button>";
 			linhas += "</td>";
 			
+			//------------ SENSOR ------------------
 			linhas += "<td class='sensor'> ... </td>";
 			
 			linhas += "</tr>";
