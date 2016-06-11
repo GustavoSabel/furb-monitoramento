@@ -7,7 +7,10 @@ EnergyMonitor energyMonitor;
 int REDE = 220; //Tensao da rede eletrica
 int PIN_SENSOR_CORRENTE = A1; //Pino do sensor de corrente
 int PIN_STATUS_SENSOR_CORRENTE = 13;
-double LIMITE_CORRENTE = 0.15; //Se ultrapassar esse valor, significa que tem corrente
+
+//Se ultrapassar esse valor, significa que tem corrente. 
+//Mes com o aparelho desligado, o sistema apresenta uma corrente entre 0.03A e 0.06A
+double LIMITE_CORRENTE = 0.15; 
 
 int ESPACO_RESERVADO_EEPROM = 500; //Espaço que cada comando ocupará
 int COMANDO_1 = 0; //Posição da memória em que ficará salvo
@@ -22,7 +25,7 @@ char RECV_PIN = 5; //Pino que irá ouvir os sinais IR
 char BUTTON_LEARN = 10; //Se precionado, indica que o dispositivo está no modo aprendizagem
 char STATUS_PIN = 7; //Pino para um LED exibir um status
 
-char PIN_ESP8266 = A4; //Quando esse pino for maior que 500, então deve enviar os comandos de desligar
+char PIN_ESP8266 = 4; //Quando esse pino for maior que 500, então deve enviar os comandos de desligar
 
 IRrecv irrecv(RECV_PIN);
 IRsend irsend;
@@ -66,7 +69,7 @@ void loop() {
   int button1State = digitalRead(BUTTON_1);
   int button2State = digitalRead(BUTTON_2);
   int buttonLearnState = digitalRead(BUTTON_LEARN);
-  int buttonEsp8266State = analogRead(PIN_ESP8266);
+  int buttonEsp8266State = digitalRead(PIN_ESP8266);
   temCorrente = verificarCorrente();
   
   if(temCorrente) {
@@ -80,7 +83,7 @@ void loop() {
       Serial.println("Busca por sinal IR finalizada");
     }
     
-    if(lastButtonEsp8266State < 100 && buttonEsp8266State > 400) {
+    if(lastButtonEsp8266State == LOW && buttonEsp8266State == HIGH) {
       Serial.println("Recebi comando do ESP8266");
       validarEnviarComando(COMANDO_1);
       validarEnviarComando(COMANDO_2);
