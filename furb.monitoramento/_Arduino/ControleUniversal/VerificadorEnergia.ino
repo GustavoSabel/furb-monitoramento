@@ -9,12 +9,12 @@ int verificarCorrente() {
     saida = 1;
   }
   
-  Serial.print(" * Corrente : ");
+  /*Serial.print(" * Corrente : ");
   Serial.print(irms); // Irms
    
   //Calcula e mostra o valor da potencia
   Serial.print(" Potencia : ");
-  Serial.println(irms * REDE);
+  Serial.println(irms * REDE);*/
   
   return saida;
 }

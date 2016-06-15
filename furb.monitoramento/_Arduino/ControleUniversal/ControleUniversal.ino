@@ -70,17 +70,18 @@ void loop() {
   int button2State = digitalRead(BUTTON_2);
   int buttonLearnState = digitalRead(BUTTON_LEARN);
   int buttonEsp8266State = digitalRead(PIN_ESP8266);
-  temCorrente = verificarCorrente();
-  
-  if(temCorrente) {
-    digitalWrite(PIN_STATUS_SENSOR_CORRENTE, HIGH);
-  } else {
-    digitalWrite(PIN_STATUS_SENSOR_CORRENTE, LOW);
-  }
 
   if(buttonLearnState == LOW){
     if (lastButtonLearnState == HIGH) {
       Serial.println("Busca por sinal IR finalizada");
+    }
+
+    temCorrente = verificarCorrente();
+    
+    if(temCorrente) {
+      digitalWrite(PIN_STATUS_SENSOR_CORRENTE, HIGH);
+    } else {
+      digitalWrite(PIN_STATUS_SENSOR_CORRENTE, LOW);
     }
     
     if(lastButtonEsp8266State == LOW && buttonEsp8266State == HIGH) {
