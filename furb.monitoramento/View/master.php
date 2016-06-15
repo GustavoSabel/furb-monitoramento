@@ -9,7 +9,6 @@
 <script type="text/javascript" src="lib/bootstrap-notify.min.js"></script>
 
 <link rel="stylesheet" type="text/css" href="Resources/main.css">
-<link rel="stylesheet" type="text/css" href="Resources/estilo.css">
 <link rel="stylesheet" type="text/css" href="lib/animate.css">
 
 <!--<link rel="stylesheet" type="text/css" href="Resources/estilo.css">-->

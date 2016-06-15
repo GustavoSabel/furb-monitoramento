@@ -10,6 +10,12 @@ if (array_key_exists ( INFO_APENAS_CADASTRADOS, $dados )) {
 } else {
 	echo json_encode ( BuscarEnderecos ( false ) );
 }
+
+/**
+ * Faz uma busca pela rede e busca todos dispositivos da rede com seu IP e Mac Address
+ * @param boolean $apenasCadastrados: Se true ou 1, retorna apenas os dispositivos encontratos que estão cadastrados no sistema
+ * @return Retorna um array com os IPs e Mac Address. A chave é o IP e o valor é o endereço mac
+ */
 function BuscarEnderecos($apenasCadastrados) {
 	$os = $_SERVER ['HTTP_USER_AGENT'];
 	// No windows não existe o software arp-scan, então apenas traz um resultado fixo para testes
@@ -41,6 +47,13 @@ function BuscarEnderecos($apenasCadastrados) {
 	
 	return $dispositivos;
 }
+
+/**
+ * Verifica se no array $dispositivos contém o $mac
+ * @param array $dispositivos
+ * @param string $mac
+ * @return boolean
+ */
 function ContemDispositivo($dispositivos, $mac) {
 	foreach ( $dispositivos as $dispo ) {
 		if ($dispo [1] == $mac) {
@@ -49,6 +62,11 @@ function ContemDispositivo($dispositivos, $mac) {
 	}
 	return false;
 }
+
+/**
+ * Simula o arp-scan para windows, ou seja, traz apenas um resultado fake para testes.
+ * Retorna o mesmo que o que o comando arp-scan retornaria no sistema linux.
+ */
 function SimularArpScan() {
 	/*for($i = 1; $i < 250; $i ++) {
 		$output [] = "192.168.1.$i 18:fe:34:a1:f5:a7 (Unknown)";
@@ -64,9 +82,8 @@ function SimularArpScan() {
 	  "192.168.1.102 f4:f1:e1:13:db:6b (Unknown)",
 	  "192.168.1.103 0c:84:dc:ff:35:a9 (Unknown)",
 	  "192.168.1.104 f4:f1:e1:13:db:6b (Unknown)",
-	  "192.168.1.105 f4:f1:e1:13:db:6b (Unknown)",
-	  "192.168.1.109 18:fe:34:a1:f5:a7 (Unknown)",
-	  "192.168.1.101 18:fe:34:f5:d6:d3 (Unknown)",
+	  "192.168.1.106 18:fe:34:a1:f5:a7 (Unknown)",
+	  "192.168.1.105 18:fe:34:f5:d6:d3 (Unknown)",
 	  "",
 	  "6 packets received by filter, 0 packets dropped by kernel",
 	  "Ending arp-scan 1.8.1: 256 hosts scanned in 3.372 seconds (75.92 hosts/sec). 6 responded"

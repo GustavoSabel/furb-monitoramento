@@ -1,10 +1,14 @@
 ﻿<?php
 	class Conexao {
+		
+		/**
+		 * Abre e retorna uma conexão aberta
+		 */
 		public static function Abrir() {
 			// definições de host, database, usuário e senha 
 			$host = "localhost"; 
 			$db = "furb_monitoramento"; 
-			$user = "root"; 
+			$user = "admin"; 
 			$pass = ""; 
 			// conecta ao banco de dados 
 			$conn = new mysqli($host, $user, $pass, $db); 
@@ -14,6 +18,10 @@
 			return $conn;
 		}
 		
+		/**
+		 * Executa um UPDATE, DELETE ou INSERT
+		 * @param string $query
+		 */
 		public static function Executar($query) {
 			$conn = Conexao::Abrir ();
 			if ($conn->query ( $query ) === TRUE) {

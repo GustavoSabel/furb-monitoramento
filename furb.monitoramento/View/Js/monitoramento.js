@@ -36,7 +36,7 @@ $(function(){
 			aoDesconectar,
 			aoOcorrerErro);
 	
-	exibirCadastrados(buscarDispositivos);
+	buscarDispositivosCadastrados(buscarDispositivosNaRede);
 	iniciarVerificacaoConexao();
 	
 	if(VERIFICAR_SENSOR) {
@@ -72,7 +72,7 @@ function iniciarVerificacaoSensor() {
 	}, DELAY_CONSULTAS_SENSOR);
 }
 
-function exibirCadastrados(callback) {
+function buscarDispositivosCadastrados(callback) {
 	var dados = JSON.stringify({operacao:"buscar"});
 	console.log(dados);
 	$.post(path_cadastro, dados, function (data) {
@@ -152,7 +152,7 @@ function exibirCadastrados(callback) {
 	}, 'json');
 }
 
-function buscarDispositivos() {
+function buscarDispositivosNaRede() {
  	var dados = {};
  	dados["apenas_cadastrados"] = "1";
  	var dadosJson = JSON.stringify(dados);

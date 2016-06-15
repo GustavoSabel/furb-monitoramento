@@ -27,6 +27,13 @@ if ($operacao == "cadastrar") {
 	$resultado ['mensagem'] = "Operação '$operacao' inválida";
 	echo json_encode ( $resultado );
 }
+
+/**
+ * Cadastra um dispositivo
+ * @param string $MacAddress Endereço mac do dispositivo
+ * @param string $Local decrição do local onde o dispositivo está
+ * @param string $observacao observações gerais sobre o dispositivo
+ */
 function Cadastrar($MacAddress, $Local, $observacao) {
 	$resultado = array ();
 	$resultado ['status'] = STATUS_FALHA;
@@ -53,6 +60,10 @@ function Cadastrar($MacAddress, $Local, $observacao) {
 	}
 	echo json_encode ( $resultado );
 }
+
+/**
+ * Edita o local e a observação de um dispositivo pelo Mac Address
+ */
 function Editar($MacAddress, $Local, $observacao) {
 	$resultado = array ();
 	$resultado ['status'] = STATUS_FALHA;
@@ -74,12 +85,20 @@ function Editar($MacAddress, $Local, $observacao) {
 	}
 	echo json_encode ( $resultado );
 }
+
+/**
+ * Busca um dispositivo cadastrado pelo Mac Address
+ */
 function Buscar($mac = null) {
 	$dispositivos = new Dispositivos ();
 	$resultado = $dispositivos->Buscar ( null, $mac );
 	
 	echo json_encode ( $resultado );
 }
+
+/**
+ * Exclui um dispositivo pelo ID ou pelo Mac Address do dispositivo
+ */
 function Excluir($Id, $MacAddress = null) {
 	$dispositivos = new Dispositivos ();
 	$resultado = array ();
