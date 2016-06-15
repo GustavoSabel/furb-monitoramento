@@ -18,13 +18,14 @@ if (array_key_exists ( INFO_APENAS_CADASTRADOS, $dados )) {
  */
 function BuscarEnderecos($apenasCadastrados) {
 	$os = $_SERVER ['HTTP_USER_AGENT'];
+	
 	// No windows não existe o software arp-scan, então apenas traz um resultado fixo para testes
-	if (preg_match ( "/windows/i", $os ) == 1) {
-		$output = SimularArpScan ();
-	} else {
+	//if (preg_match ( "/windows/i", $os ) == 1) {
+	//	$output = SimularArpScan ();
+	//} else {
 		$cmd = "sudo arp-scan --localnet --timeout=1000";
 		exec ( $cmd, $output );
-	}
+	//}
 	
 	$dispositivos = array ();
 	
