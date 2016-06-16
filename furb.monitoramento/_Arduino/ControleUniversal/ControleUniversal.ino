@@ -220,7 +220,6 @@ void validarEnviarComando(int comandoId) {
         Serial.println("Tem corrente para enviar o comando");
       digitalWrite(STATUS_PIN, HIGH);
       enviarCodigo(0, &comando);
-      delay(50);
       enviarCodigo(REPEAT, &comando);
       digitalWrite(STATUS_PIN, LOW);
       //Aguarda alguns segundos para depois enviar o comando novamente
@@ -229,7 +228,6 @@ void validarEnviarComando(int comandoId) {
       delay(2000); 
       digitalWrite(STATUS_PIN, HIGH);
       enviarCodigo(0, &comando);
-      delay(50);
       enviarCodigo(REPEAT, &comando);
       digitalWrite(STATUS_PIN, LOW);
       delay(50);
@@ -243,6 +241,11 @@ void validarEnviarComando(int comandoId) {
 }
 
 void enviarCodigo(int repeat, Comando *comando) {  
+  if(repeat) {
+    Serial.println("Aguarda 50 milisegundos");
+    delay(50);
+  }
+
   Serial.print("Enviando o comando ");
   Serial.print(comando->id);
   Serial.print(": ");
