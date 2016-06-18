@@ -159,7 +159,7 @@ function buscarDispositivosNaRede() {
 
  	atualizarStatusByClasse(DISP_NAO_ENCONTRATO, DISP_PROCURANDO, "Procurando...")
  	
-	$.post(path_consulta, dadosJson, function (data) {
+	$.post(path_monitoramento, dadosJson, function (data) {
 		for(var ip in data) {
 			dispositivos[ip] = { data : Date.now(), macAddress : data[ip] }
 			var linha = getLinhaByIP(ip);

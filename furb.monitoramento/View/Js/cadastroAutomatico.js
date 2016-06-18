@@ -11,7 +11,7 @@ $(function(){
 	
 	qtdEncontrados = 0;
 	
-	$.post(path_consulta, "{}", function (data){
+	$.post(path_monitoramento, "{}", function (data){
 		console.log(data);
 		total = Object.keys(data).length;
 		if(total > 0) {
