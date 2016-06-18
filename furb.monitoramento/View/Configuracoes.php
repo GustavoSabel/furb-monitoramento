@@ -18,13 +18,13 @@
 	<div class="form-group col-sm-4">
 		<label for="tempo">Tempo para desligar automaticamente: </label>
 
-		<span class="tooltip">
-			<img src="Resources/Imagens/help.png" alt="help" />
-		  	<span class="tooltiptext">
-		  		Tempo (em minutos) em que a sala está sem movimento detectado. 
-		  		Após esse tempo, os aparelhos serã desligados automaticamente.
-		  	</span>
-		</span>
+<!-- 		<span class="tooltip"> -->
+<!-- 			<img src="Resources/Imagens/help.png" alt="help" /> -->
+<!-- 		  	<span class="tooltiptext"> -->
+<!-- 		  		Tempo (em minutos) em que a sala está sem movimento detectado.  -->
+<!-- 		  		Após esse tempo, os aparelhos serã desligados automaticamente. -->
+<!-- 		  	</span> -->
+<!-- 		</span> -->
 		
 		<input class="form-control" type="text" name="tempo" id="tempo" autocomplete="off" 
 		value='<?php echo $configuracao->TempoDesligamento ?>'> 

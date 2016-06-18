@@ -1,6 +1,6 @@
 var path_configuracoes = "../Controller/ConfiguracoesController.php";
-var path_cadastro = "../Controller/Cadastro.php";
-var path_consulta = "../Controller/ConsultarEsp.php"
+var path_cadastro = "../Controller/CadastroController.php";
+var path_consulta = "../Controller/MonitoramentoController.php"
 
 String.prototype.remover = function(caracter) {
 	var target = this;

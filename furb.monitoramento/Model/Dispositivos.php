@@ -1,5 +1,5 @@
 <?php
-require_once ("../Controller/Conexao.php");
+require_once ("Conexao.php");
 class Dispositivos {
 	public function Buscar($Id = null, $MacAddress = null) {
 		$MacAddress = trim ( $MacAddress );
