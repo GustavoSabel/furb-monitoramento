@@ -8,13 +8,29 @@ $dados = json_decode ( file_get_contents ( 'php://input' ), true );
 $operacao = $dados ["operacao"];
 
 if ($operacao == "atualizar") {
-	Atualizar ( $dados ["login"], $dados ["senha"], $dados ["tempo"] );
+	$result = Atualizar ( $dados ["login"], $dados ["senha"], $dados ["tempo"] );
+	echo json_encode($result);
 } else if ($operacao == "buscar") {
 	echo json_encode ( Buscar ());
 }
 function Atualizar($login, $senha, $tempo) {
 	$resultado = array ();
 	$resultado ['status'] = STATUS_FALHA;
+	$login = trim($login);
+	if($login == "") {
+		$resultado['mensagem'] = 'O login é um campo obrigatório';
+		return $resultado;
+	}
+	if($senha == "") {
+		$resultado['mensagem'] = 'A senha é um campo obrigatório';
+		return $resultado;
+	}
+	$tempo = trim($tempo);
+	if($tempo == "") {
+		$resultado['mensagem'] = 'O tempo é um campo obrigatório';
+		return $resultado;
+	}
+	
 	$configuracao = new Configuracao ();
 	if (($result = $configuracao->Alterar( $login, $senha, $tempo)) !== true) {
 		$resultado ['mensagem'] = $result;
@@ -22,7 +38,7 @@ function Atualizar($login, $senha, $tempo) {
 		$resultado ['status'] = STATUS_SUCESSO;
 		$resultado ['mensagem'] = 'Alterado com sucesso';
 	}
-	echo json_encode ( $resultado );
+	return $resultado;
 }
 function Buscar() {
 	$configuracoes = new Configuracao ();

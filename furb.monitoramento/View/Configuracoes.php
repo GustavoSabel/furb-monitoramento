@@ -9,25 +9,41 @@
 <form id="configuracoes" action="" method="post" role="form"> 
 	<div class="form-group col-sm-4">
 		<label for="login">Login:</label>
-		<input class="form-control" type="text" name="login" id="login" autocomplete="on" value='<?php echo $configuracao->Login ?>'> 
+		<input 
+			class="form-control" 
+			placeholder="ex: olimex" 
+			type="text" 
+			name="login" 
+			id="login" 
+			autocomplete="on" 
+			required 
+			title="Será utilizado para se conectar ao dispositivo que está na sala"
+			value='<?php echo $configuracao->Login ?>'>
 	</div>
 	<div class="form-group col-sm-4">
 		<label for="senha">Senha:</label>
-		<input class="form-control" type="password" name="senha" id="senha" autocomplete="off" value='<?php echo $configuracao->Senha ?>'>
+		<input 
+			class="form-control" 
+			type="password" 
+			name="senha" 
+			id="senha" 
+			autocomplete="off" 
+			required
+			title="Será utilizado para se conectar ao dispositivo que está na sala"
+			value='<?php echo $configuracao->Senha ?>'>
 	</div>
 	<div class="form-group col-sm-4">
-		<label for="tempo">Tempo para desligar automaticamente: </label>
-
-<!-- 		<span class="tooltip"> -->
-<!-- 			<img src="Resources/Imagens/help.png" alt="help" /> -->
-<!-- 		  	<span class="tooltiptext"> -->
-<!-- 		  		Tempo (em minutos) em que a sala está sem movimento detectado.  -->
-<!-- 		  		Após esse tempo, os aparelhos serã desligados automaticamente. -->
-<!-- 		  	</span> -->
-<!-- 		</span> -->
-		
-		<input class="form-control" type="text" name="tempo" id="tempo" autocomplete="off" 
-		value='<?php echo $configuracao->TempoDesligamento ?>'> 
+		<label for="tempo">Tempo para desligar automaticamente (Em min.): </label>
+		<input 
+			class="form-control" 
+			placeholder="ex: Para 30 min, colocar 1800" 
+			type="text" 
+			name="tempo" 
+			id="tempo" 
+			autocomplete="off" 
+			required
+			title="Tempo limite em minutos que a sala pode ficar sem movimento. Ao ultrapassar esse valor, a sala será considerada vazia e os aparelhos eletrônicos serão desligados automaticamente"
+			value='<?php echo $configuracao->TempoDesligamento ?>'> 
 	</div>
 
 	<div class="form-group col-sm-12">
