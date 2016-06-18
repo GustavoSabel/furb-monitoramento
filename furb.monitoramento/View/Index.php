@@ -11,8 +11,7 @@
 	var configuracoes = JSON.parse('<?php echo $configJson; ?>');
 </script>
 
-<button class="btn btn-primary" data-toggle="tooltip" title="
-			Caso alguns dispositivos não tenham sido encontrados, ao clicar nesse comando será feita uma nova busca na rede para encontrá-los. Os dispositivos já encontrados não sofrerãoimpacto." 
+<button class="btn btn-primary" data-toggle="tooltip" title="Caso alguns dispositivos não tenham sido encontrados, ao clicar nesse comando será feita uma nova busca na rede para encontrá-los. Os dispositivos já encontrados não sofrerãoimpacto." 
 			onClick="buscarDispositivos()">
 	Buscar novamente </button>
 

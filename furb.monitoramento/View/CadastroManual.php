@@ -23,13 +23,13 @@
 </form>
 
 
-<table class="table col-sm-12" id="DispositivosCadastrados">
+<table class="table-striped col-sm-12" id="DispositivosCadastrados">
 	<thead>
 	  	<tr>
-			<th>Comandos</th>
-			<th>Mac Addrress</th>
+			<th>Ações</th>
+			<th>Mac Address</th>
 			<th>Localização</th>
-			<th>Observacao</th>
+			<th>Observação</th>
 		</tr>
 	</thead>
 	<tbody>	</tbody>
