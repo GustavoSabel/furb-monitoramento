@@ -8,7 +8,7 @@
 
 <form id="configuracoes" action="" method="post" role="form"> 
 	<div class="form-group col-sm-4">
-		<label for="login">Login:</label>
+		<label for="login">Usuário:</label>
 		<input 
 			class="form-control" 
 			placeholder="ex: olimex" 
@@ -47,7 +47,7 @@
 	</div>
 
 	<div class="form-group col-sm-12">
-		<button type="submit" class="btn btn-success">Cadastrar</button>
+		<button type="submit" class="btn btn-success">Gravar</button>
 	</div>
 </form>
 
