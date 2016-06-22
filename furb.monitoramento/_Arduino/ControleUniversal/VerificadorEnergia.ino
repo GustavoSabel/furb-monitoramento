@@ -1,4 +1,4 @@
-//Retorna 1 se tiver corrente
+//Retorna 1 se for identificado alguma corrente elétrica e 0 se não tiver
 int verificarCorrente() {
   int saida = 0;
   
@@ -11,10 +11,14 @@ int verificarCorrente() {
   
   /*Serial.print(" * Corrente : ");
   Serial.print(irms); // Irms
-   
-  //Calcula e mostra o valor da potencia
   Serial.print(" Potencia : ");
   Serial.println(irms * REDE);*/
-  
+
+  if(saida) {
+    digitalWrite(PIN_STATUS_SENSOR_CORRENTE, HIGH);
+  } else {
+    digitalWrite(PIN_STATUS_SENSOR_CORRENTE, LOW);
+  }
+    
   return saida;
 }

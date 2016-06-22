@@ -1,6 +1,6 @@
 
-void gravarNoEEPRON(Comando *command){
-  Serial.println("Salvando comandos na memoria");   
+void gravarNoEEPROM(Comando *command){
+  Serial.println("Salvando comando na memoria");   
   int addr = command->id * ESPACO_RESERVADO_EEPROM;
   EEPROM.put(addr, CODE_EEPROM);
   addr += sizeof(long);
@@ -24,7 +24,7 @@ void gravarNoEEPRON(Comando *command){
 }
 
 //Busca o comando salvo na memória
-void carregarComandoEEPRON(int comandoId, Comando *command) {
+void carregarComandoEEPROM(int comandoId, Comando *command) {
   Serial.println("Buscando comando da memoria");
 
   int addr = comandoId * ESPACO_RESERVADO_EEPROM;
@@ -80,7 +80,7 @@ void carregarComandoEEPRON(int comandoId, Comando *command) {
 
 //Retorna 1 se o comando está salvo na memória EEPROM
 //Retorna 0 caso não esteja
-int comandoEstaSalvo(int comandoId) {
+int comandoEstaSalvoEEPROM(int comandoId) {
   long code_eepron = 0;
   int addr = comandoId * ESPACO_RESERVADO_EEPROM;
   EEPROM.get(addr, code_eepron);
