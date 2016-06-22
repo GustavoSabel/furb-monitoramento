@@ -18,18 +18,18 @@ int COMANDO_2 = 1; //Posição da memória em que ficará salvo
 long CODE_EEPROM = 112358; //Se esse número estiver na primeira posição, então tem algo salvo lá
 
 //Deve ser conectado um LED IR no pino 3
-char BUTTON_1 = 8; //Botão que envia ou grava o sinal 1
-char BUTTON_2 = 9; //Botão que envia ou grava o sinal 2
+char PIN_BOTAO_1 = 8; //Botão que envia ou grava o sinal 1
+char PIN_BOTAO_2 = 9; //Botão que envia ou grava o sinal 2
 char PIN_VERIFICADOR = 12; //Se esse pino estiver HIGT, então deve-se verificar a corrente antes de mandar o comando de desligar
-char RECV_PIN = 5; //Pino que irá ouvir os sinais IR
-char BUTTON_LEARN = 10; //Se precionado, indica que o dispositivo está no modo aprendizagem
-char STATUS_PIN = 7; //Pino para um LED exibir um status
+char PIN_IR_RECEPTOR = 5; //Pino que irá ouvir os sinais IR
+char PIN_BOTAO_APRENDER = 10; //Se precionado, indica que o dispositivo está no modo aprendizagem
+char PIN_IR_STATUS = 7; //Pino para um LED exibir um status
 
-char PIN_ESP8266 = 4; //Quando esse pino for maior que 500, então deve enviar os comandos de desligar
+char PIN_ESP8266 = 4; //Quando estiver em HIGH, então os comandos IR devem ser enviados
 
-IRrecv irReceptor(RECV_PIN);
-IRsend irsend;
-decode_results results;
+IRrecv irReceptor(PIN_IR_RECEPTOR);
+IRsend irEmissor;
+decode_results resultadoIR;
 
 int ultimoBotao1Estado;
 int ultimoBotao2Estado;
@@ -49,23 +49,24 @@ struct Comando {
 
 void setup() {
   Serial.begin(9600);
-  pinMode(BUTTON_1, INPUT);
-  pinMode(BUTTON_2, INPUT);
-  pinMode(BUTTON_LEARN, INPUT);
-  pinMode(STATUS_PIN, OUTPUT);
+  pinMode(PIN_BOTAO_1, INPUT);
+  pinMode(PIN_BOTAO_2, INPUT);
+  pinMode(PIN_BOTAO_APRENDER, INPUT);
+  pinMode(PIN_IR_STATUS, OUTPUT);
   pinMode(PIN_ESP8266, INPUT);
 
   pinMode(PIN_STATUS_SENSOR_CORRENTE, OUTPUT); 
-  //Pino, calibracao - Cur Const= Ratio/BurdenR. 1800/62 = 29. 
-  energyMonitor.current(PIN_SENSOR_CORRENTE, 29);
+  //Ratio/Burden Resistor. 
+  int calibracao = 1800/62;
+  energyMonitor.current(PIN_SENSOR_CORRENTE, calibracao);
 
   Serial.println("SISTEMA INICIADO");
 }
 
 void loop() {
-  int botao1Estado = digitalRead(BUTTON_1);
-  int botao2Estado = digitalRead(BUTTON_2);
-  int botaoAprenderEstado = digitalRead(BUTTON_LEARN);
+  int botao1Estado = digitalRead(PIN_BOTAO_1);
+  int botao2Estado = digitalRead(PIN_BOTAO_2);
+  int botaoAprenderEstado = digitalRead(PIN_BOTAO_APRENDER);
   int entradaEsp8266Estado = digitalRead(PIN_ESP8266);
 
   if(botaoAprenderEstado == LOW){
@@ -89,12 +90,12 @@ void loop() {
       Serial.println("Aguardando sinal IR");
       irReceptor.enableIRIn(); // Ativa o receptor IR
     }
-    if (irReceptor.decode(&results)) {
+    if (irReceptor.decode(&resultadoIR)) {
       if(botao1Estado == HIGH){
-        criarComando(&results, COMANDO_1, &comando);
+        criarComando(&resultadoIR, COMANDO_1, &comando);
       }
       if(botao2Estado == HIGH){
-        criarComando(&results, COMANDO_2, &comando);
+        criarComando(&resultadoIR, COMANDO_2, &comando);
       }
       irReceptor.resume(); // reinicia receptor
     }
@@ -105,15 +106,15 @@ void loop() {
   ultimaEntradaEsp8266Estado = entradaEsp8266Estado;
 }
 
-//Convert *results em um comando
-void criarComando(decode_results *results, int comandoId, Comando * comando) {
-  digitalWrite(STATUS_PIN, HIGH);
+//Convert *resultadoIR em um comando
+void criarComando(decode_results *resultadoIR, int comandoId, Comando * comando) {
+  digitalWrite(PIN_IR_STATUS, HIGH);
   Serial.print("Salvando o comando ");
   Serial.println(comandoId);
   comando->id = comandoId;
   comando->verificarCorrente = digitalRead(PIN_VERIFICADOR) == HIGH;
-  comando->codeType = results->decode_type;
-  int count = results->rawlen;
+  comando->codeType = resultadoIR->decode_type;
+  int count = resultadoIR->rawlen;
   int isRawCode = 0;
   
   if (comando->codeType == UNKNOWN) {
@@ -121,13 +122,13 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
     isRawCode = 1;
   } else if (comando->codeType == NEC) {
     Serial.print("Received NEC: ");
-    if (results->value == REPEAT) {
+    if (resultadoIR->value == REPEAT) {
       // Don't record a NEC repeat value as that's useless.
       Serial.println("repeat; ignoring.");
-      digitalWrite(STATUS_PIN, LOW);
+      digitalWrite(PIN_IR_STATUS, LOW);
       return;
     }
-    Serial.println(results->value, HEX);
+    Serial.println(resultadoIR->value, HEX);
   } else if (comando->codeType == SONY) {
     Serial.print("Received SONY: ");
   } else if (comando->codeType == PANASONIC) {
@@ -146,12 +147,12 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
   }
   
   if(isRawCode == 0) {
-    Serial.println(results->value, HEX);
-    comando->codeValue = results->value;
-    comando->codeLen = results->bits;
+    Serial.println(resultadoIR->value, HEX);
+    comando->codeValue = resultadoIR->value;
+    comando->codeLen = resultadoIR->bits;
   } else {
     comando->codeValue = -1;
-    comando->codeLen = results->rawlen - 1;
+    comando->codeLen = resultadoIR->rawlen - 1;
     
     // Para armazenar os dados brutos:
     // Descartar o primeiro valor;
@@ -160,17 +161,17 @@ void criarComando(decode_results *results, int comandoId, Comando * comando) {
     for (int i = 1; i <= comando->codeLen; i++) {
       if (i % 2) {
         // Mark
-        comando->rawCodes[i - 1] = results->rawbuf[i]*USECPERTICK - MARK_EXCESS;
+        comando->rawCodes[i - 1] = resultadoIR->rawbuf[i]*USECPERTICK - MARK_EXCESS;
       } 
       else {
         // Space
-        comando->rawCodes[i - 1] = results->rawbuf[i]*USECPERTICK + MARK_EXCESS;
+        comando->rawCodes[i - 1] = resultadoIR->rawbuf[i]*USECPERTICK + MARK_EXCESS;
       }
     }
     printCodigoBruto(comando);
   }
   gravarNoEEPROM(comando);
-  digitalWrite(STATUS_PIN, LOW);
+  digitalWrite(PIN_IR_STATUS, LOW);
 }
 
 void printCodigoBruto(Comando *command) {
@@ -210,8 +211,8 @@ void validarEnviarComando(int comandoId) {
 
 //Envia o comando
 void enviarComando(Comando *comando) {  
-  digitalWrite(STATUS_PIN, HIGH);
-  irsend.sendRaw(comando->rawCodes, comando->codeLen, 38);
-  digitalWrite(STATUS_PIN, LOW);
+  digitalWrite(PIN_IR_STATUS, HIGH);
+  irEmissor.sendRaw(comando->rawCodes, comando->codeLen, 38);
+  digitalWrite(PIN_IR_STATUS, LOW);
   delay(50);
 }
