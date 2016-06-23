@@ -18,7 +18,7 @@
 <table class="table col-sm-12" id="TabelaMonitoriamento">
 	<thead>
 	  <tr>
-		<th class='colMac'>Mac Addrress</th>
+		<th class='colMac'>Endereço MAC</th>
 		<th class='colStatus'>Status</th>
 		<th class='colHistorio'>Histórico</th>
 		<th class='colIP'>IP</th>

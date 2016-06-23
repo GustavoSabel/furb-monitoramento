@@ -11,7 +11,7 @@
 	<thead>
 	  	<tr>
 			<th>Comando</th>
-			<th>Mac Address</th>
+			<th>Endereço MAC</th>
 			<th>IP</th>
 			<th>Local</th>
 			<th>Observação</th>

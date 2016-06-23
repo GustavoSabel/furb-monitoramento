@@ -4,7 +4,7 @@
 
 <form id="formCadastro" action="" method="post" role="form"> 
 	<div class="form-group col-sm-6">
-		<label for="macaddress">Mac Address:</label>
+		<label for="macaddress">Endereço MAC:</label>
 		<input class="form-control" placeholder="Ex: 18:fe:34:a1:f5:a7" type="text" name="macaddress" id="macaddress" autocomplete="off" required>
 	</div>
 	<div class="form-group col-sm-6">
